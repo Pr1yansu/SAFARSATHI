@@ -4,7 +4,7 @@ const baseUrl = `${process.env.REACT_APP_BACKEND_URL}/api/v1/users`;
 
 export const userApi = createApi({
   reducerPath: "userApi",
-  baseQuery: fetchBaseQuery({ baseUrl }),
+  baseQuery: fetchBaseQuery({ baseUrl, credentials: "include" }),
   tagTypes: ["User"],
   endpoints: (builder) => ({
     register: builder.mutation({

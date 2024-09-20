@@ -16,25 +16,15 @@ const {
   adminMiddleware,
   authMiddleware,
 } = require("../middleware/auth.middleware");
+const router = require("./countries.routes");
 
-// Auth Routes
-route.post("/login", (req, res) => {
-  passport.authenticate("local", (err, user, options) => {
-    if (user) {
-      req.login(user, (error) => {
-        if (error) {
-          return res.status(500).json({ message: error });
-        } else {
-          return res
-            .status(200)
-            .json({ user: user, message: "Logged in successfully" });
-        }
-      });
-    } else {
-      return res.status(401).json({ message: options.message });
-    }
-  })(req, res);
-});
+router.post(
+  "/login",
+  passport.authenticate("local", { failureRedirect: "/login" }),
+  function (req, res) {
+    res.redirect("/");
+  }
+);
 
 route.get(
   "/auth/google",
