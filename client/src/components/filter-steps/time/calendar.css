@@ -1,0 +1,20 @@
+/* Hide unnecessary elements */
+.rdrDefinedRangesWrapper,
+.rdrDateDisplayWrapper {
+    @apply hidden;
+}
+
+/* Apply font and sizing */
+.rdrDateRangePickerWrapper,
+.rdrMonth,
+.rdrCalendarWrapper.rdrDateRangeWrapper,
+.rdrMonths.rdrMonthsVertical {
+    @apply !w-full block font-sans;
+    font-optical-sizing: auto;
+    font-size: medium;
+}
+
+/* Custom background color using Tailwind */
+.rdrCalendarWrapper {
+    @apply text-white rounded-lg w-full;
+}
