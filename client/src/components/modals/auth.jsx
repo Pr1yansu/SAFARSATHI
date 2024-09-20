@@ -33,7 +33,6 @@ const Auth = () => {
         }
         if (data) {
           toast.success(data);
-          navigate(0);
         }
       }
       if (variant === "register") {
