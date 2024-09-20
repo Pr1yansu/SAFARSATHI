@@ -20,9 +20,12 @@ const router = require("./countries.routes");
 
 router.post(
   "/login",
-  passport.authenticate("local", { failureRedirect: "/login" }),
+  passport.authenticate("local", {
+    failureRedirect: `${process.env.FRONTEND_URL}/login`,
+    failureMessage: "Invalid username or password",
+  }),
   function (req, res) {
-    res.redirect("/");
+    res.status(200).json({ message: "Logged in successfully" });
   }
 );
 
