@@ -1,5 +1,7 @@
 exports.authMiddleware = function (req, res, next) {
-  console.log(req.cookies);
+  console.log(req.session);
+
+  console.log(req.cookies["connect.sid"]);
 
   if (req.isAuthenticated()) {
     return next();
