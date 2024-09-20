@@ -67,10 +67,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Passport middleware
-app.use(passport.initialize());
-app.use(passport.session());
-
 // Session middleware
 app.use(
   session({
@@ -89,6 +85,10 @@ app.use(
     },
   })
 );
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Dev logging middleware
 app.use(morgan("dev"));
