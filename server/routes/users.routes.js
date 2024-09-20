@@ -92,6 +92,6 @@ route.get("/current/profile", authMiddleware, getCurrentUser);
 // Registration and Password Management Routes
 route.post("/register", registerUser);
 route.post("/forgot-password", forgotPassword);
-route.put("/reset-password", resetPassword);
+route.post("/reset-password", resetPassword);
 
 module.exports = route;

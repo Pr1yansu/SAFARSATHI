@@ -115,6 +115,7 @@ const Auth = () => {
                     loading={loading}
                     setUser={setUser}
                     user={user}
+                    open={open}
                   />
                 )}
                 {variant === "register" && (
@@ -193,7 +194,7 @@ const Auth = () => {
   );
 };
 
-const LoginComponent = ({ onSubmit, loading, setUser, user }) => (
+const LoginComponent = ({ onSubmit, loading, setUser, user, open }) => (
   <form className="space-y-4" onSubmit={onSubmit}>
     <div>
       <h4 className="text-lg font-semibold text-gray-800 text-center">Login</h4>
@@ -228,6 +229,12 @@ const LoginComponent = ({ onSubmit, loading, setUser, user }) => (
         value={user.password}
       />
     </div>
+    <p
+      className="text-sm text-gray-500 text-right cursor-pointer hover:underline"
+      onClick={() => open("forgotPassword")}
+    >
+      Forgot password?
+    </p>
     <Button
       size="md"
       intent="primary"

@@ -19,11 +19,14 @@ import Categories from "./pages/admin/categories";
 import AdminHeader from "./components/ui/admin-header";
 import AllListedHomes from "./pages/admin/all-listed";
 import AllUsers from "./pages/admin/all-users";
+import ForgotPassword from "./components/modals/forgot-password";
+import ResetPassword from "./pages/reset-password";
 
 const Home = React.lazy(() => import("./pages/home"));
 const SingleListing = React.lazy(() => import("./pages/single-listing"));
 const FavoriteListings = React.lazy(() => import("./pages/favorite-listings"));
 const ListedHomes = React.lazy(() => import("./pages/listed-homes"));
+const ErrorPage = React.lazy(() => import("./pages/error-page"));
 
 const AuthProvider = ({ children }) => {
   const location = useLocation();
@@ -124,12 +127,19 @@ const App = () => {
             path="/tourist-spot/:id"
             element={<SingleListing profile={profile} />}
           />
+
+          {profile ? null : (
+            <Route path="/reset-password/:id" element={<ResetPassword />} />
+          )}
+
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
       </Suspense>
       <Auth />
       <Filters />
       <ProfileModal />
       <RentHome />
+      <ForgotPassword />
       <Toaster position="bottom-right" reverseOrder={false} gutter={8} />
     </BrowserRouter>
   );

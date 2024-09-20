@@ -5,7 +5,7 @@ const sendMail = async (email, subject, text, html) => {
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: process.env.EMAIL_PORT,
-      secure: process.env.EMAIL_SECURE,
+      secure: false,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -23,6 +23,7 @@ const sendMail = async (email, subject, text, html) => {
     console.log("Message sent: %s", info.messageId);
   } catch (error) {
     console.error("Error sending email:", error);
+    throw new Error("Failed to send email");
   }
 };
 

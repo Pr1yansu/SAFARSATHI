@@ -13,7 +13,7 @@ const forgotPasswordTemplate = async (reset_link) => {
   try {
     const path = `${__dirname}/../templates/forgot-password.html`;
     const html = await readFileAsync(path, "utf-8");
-    return html.replace("{{ reset_link }}", reset_link);
+    return html.replace(/{{ reset_link }}/g, reset_link); // This will replace all instances
   } catch (error) {
     logger.error("Error reading forgot password template:", error);
     throw new Error("Failed to load email template");
@@ -266,7 +266,7 @@ exports.changePassword = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    const duration = 15 * 60 * 1000;
+    const duration = 2 * 60 * 1000;
 
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
@@ -278,8 +278,14 @@ exports.forgotPassword = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    if (user.provider === "google" || user.provider === "github") {
+      return res
+        .status(400)
+        .json({ message: "Your account is verified with another provider" });
+    }
+
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "15m",
+      expiresIn: "1d",
     });
 
     const resetUrl = `${process.env.CLIENT_URL}/reset-password/${token}`;
@@ -301,6 +307,7 @@ exports.forgotPassword = async (req, res) => {
 exports.resetPassword = async (req, res) => {
   try {
     const { token, password } = req.body;
+    console.log(token, password);
 
     if (!token || !password) {
       return res
@@ -325,7 +332,9 @@ exports.resetPassword = async (req, res) => {
     logger.error("Error resetting password:", error);
 
     if (error.name === "TokenExpiredError") {
-      return res.status(400).json({ message: "Token expired" });
+      return res
+        .status(400)
+        .json({ message: "Token expired please try again" });
     }
 
     return res.status(500).json({ message: "Failed to reset password" });

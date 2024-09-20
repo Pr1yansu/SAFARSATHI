@@ -2,18 +2,24 @@ import React from "react";
 import { IoMdMenu } from "react-icons/io";
 import { IoLogOut, IoSearchOutline } from "react-icons/io5";
 import { FaUserCircle } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import Button from "./button";
+import { Link, useLocation } from "react-router-dom";
 import Separator from "./separator";
 import Menu from "./menu";
 import useModal from "../hooks/modal";
 import { useProfileQuery } from "../../store/apis/user";
 import Loader from "./loader";
 
+const hideHeader = ["/reset-password"];
+
 const Header = () => {
   const { data: profile, isLoading, isFetching } = useProfileQuery();
+  const pathname = useLocation().pathname;
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const openModal = useModal((state) => state.open);
+
+  if (hideHeader.some((path) => new RegExp(path).test(pathname))) {
+    return null;
+  }
 
   if (isLoading || isFetching) {
     return <Loader />;

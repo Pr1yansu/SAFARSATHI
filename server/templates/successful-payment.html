@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Successful</title>
+  </head>
+  <body
+    style="
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #f8f8f8; border-radius: 5px; overflow: hidden"
+    >
+      <tr>
+        <td style="padding: 30px">
+          <h1 style="color: #2c3e50; text-align: center; margin-bottom: 20px">
+            Payment Successful
+          </h1>
+          <p>Dear {{ name }},</p>
+          <p>
+            Thank you for your payment. We're pleased to confirm that your
+            transaction has been successfully processed.
+          </p>
+          <table
+            width="100%"
+            cellpadding="10"
+            cellspacing="0"
+            style="
+              background-color: #ffffff;
+              border-radius: 5px;
+              margin-bottom: 20px;
+            "
+          >
+            <tr>
+              <td style="border-bottom: 1px solid #eee">
+                <strong>Amount Paid:</strong>
+              </td>
+              <td style="border-bottom: 1px solid #eee; text-align: right">
+                {{ currency }} {{ amount }}
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Email:</strong></td>
+              <td style="text-align: right">{{ email }}</td>
+            </tr>
+          </table>
+          <p>
+            If you have any questions about this payment or your purchase,
+            please don't hesitate to contact our customer support team.
+          </p>
+          <p>We appreciate your business and hope you enjoy your purchase!</p>
+          <p>Best regards,</p>
+          <p style="font-weight: bold">The Tour Travel Team</p>
+        </td>
+      </tr>
+    </table>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td
+          style="
+            padding-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+          "
+        >
+          This is an automated email. Please do not reply directly to this
+          message.
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

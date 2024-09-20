@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema(
       },
       trim: true,
       minLength: [6, "Password must be at least 6 characters"],
-      maxLength: [50, "Password must be at most 50 characters"],
+      maxLength: [200, "Password must be at most 50 characters"],
     },
     avatar: {
       type: String,
@@ -66,7 +66,6 @@ userSchema.index({ email: 1 }, { unique: true });
 userSchema.methods.toJSON = function () {
   const user = this.toObject();
   delete user.password;
-
   return user;
 };
 

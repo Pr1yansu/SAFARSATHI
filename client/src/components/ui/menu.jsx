@@ -6,18 +6,18 @@ import useModal from "../hooks/modal";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaUserCircle } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
-import { BiHomeAlt2 } from "react-icons/bi";
+import { BiHomeAlt2, BiLogOut } from "react-icons/bi";
+import { useLogoutMutation } from "../../store/apis/user";
 
 const Menu = ({ isOpen, profile, setIsMenuOpen }) => {
+  const [logout] = useLogoutMutation();
   const { pathname } = useLocation();
   const openModal = useModal((state) => state.open);
-
   useEffect(() => {
-    if (isOpen) {
+    if (setIsMenuOpen) {
       setIsMenuOpen(false);
     }
-  }, [pathname]);
-
+  }, [pathname, setIsMenuOpen]);
   return (
     <AnimatePresence>
       {isOpen && (
@@ -96,12 +96,25 @@ const Menu = ({ isOpen, profile, setIsMenuOpen }) => {
               </li>
             )}
             {profile && (
-              <li className="hover:bg-gray-100 px-4 py-2 duration-150 ">
-                <Link to="/listed" className="flex items-center gap-2">
-                  <BiHomeAlt2 size={18} />
-                  Listed homes
-                </Link>
-              </li>
+              <>
+                <li className="hover:bg-gray-100 px-4 py-2 duration-150 ">
+                  <Link to="/listed" className="flex items-center gap-2">
+                    <BiHomeAlt2 size={18} />
+                    Listed homes
+                  </Link>
+                </li>
+                <li className="hover:bg-red-500/70 px-4 py-2 duration-150 flex items-center gap-2 bg-red-500 text-white">
+                  <BiLogOut size={18} />
+                  <button
+                    onClick={async () => {
+                      await logout();
+                      window.location.reload();
+                    }}
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
             )}
           </ul>
         </motion.div>

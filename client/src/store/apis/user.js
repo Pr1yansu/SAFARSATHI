@@ -22,6 +22,8 @@ export const userApi = createApi({
         return response.data.message;
       },
       transformResponse: (response) => {
+        console.log(response);
+
         return response.message;
       },
     }),
@@ -51,7 +53,7 @@ export const userApi = createApi({
       }),
       providesTags: ["User"],
     }),
-    logout: builder.query({
+    logout: builder.mutation({
       query: () => ({
         url: `${baseUrl}/logout`,
         method: "GET",
@@ -86,6 +88,41 @@ export const userApi = createApi({
       }),
       invalidatesTags: ["User"],
     }),
+    forgotPassword: builder.mutation({
+      query: (email) => ({
+        url: `${baseUrl}/forgot-password`,
+        method: "POST",
+        body: {
+          email,
+        },
+      }),
+      transformErrorResponse: (response) => {
+        return response.data.message;
+      },
+      transformResponse: (response) => {
+        console.log(response);
+        return {
+          message: response.message,
+          duration: response.duration,
+        };
+      },
+    }),
+    resetPassword: builder.mutation({
+      query: ({ password, token }) => ({
+        url: `${baseUrl}/reset-password`,
+        method: "POST",
+        body: {
+          password,
+          token,
+        },
+      }),
+      transformErrorResponse: (response) => {
+        return response.data.message;
+      },
+      transformResponse: (response) => {
+        return response.message;
+      },
+    }),
   }),
 });
 
@@ -93,8 +130,10 @@ export const {
   useRegisterMutation,
   useLoginMutation,
   useProfileQuery,
-  useLogoutQuery,
+  useLogoutMutation,
   useGetAllUsersQuery,
   useGetUserByIdQuery,
   useUpdateUserRoleMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
 } = userApi;

@@ -8,7 +8,14 @@ body {
     font-optical-sizing: auto;
 }
 
+::selection {
+    background-color: transparent;
+}
 
+input::selection,
+textarea::selection {
+    @apply bg-violet-500/30;
+}
 
 svg,
 circle,

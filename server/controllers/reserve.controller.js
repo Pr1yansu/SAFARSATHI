@@ -5,6 +5,21 @@ const Order = require("../models/order.model");
 const razorpay = require("razorpay");
 const crypto = require("crypto");
 const short = require("short-uuid");
+const { sendMail } = require("../utils/mail.utils");
+
+const successfulPaymentTemplate = async (name, amount, currency, email) => {
+  try {
+    const path = `${__dirname}/../templates/successful-payment.html`;
+    const html = await readFileAsync(path, "utf-8");
+    return html
+      .replace(/{{ name }}/g, name)
+      .replace(/{{ amount }}/g, amount)
+      .replace(/{{ currency }}/g, currency)
+      .replace(/{{ email }}/g, email);
+  } catch (error) {
+    logger.error("Error reading successful payment template:", error);
+  }
+};
 
 const instance = new razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -144,7 +159,9 @@ exports.createOrder = async (req, res) => {
 
 exports.verifyPayment = async (req, res) => {
   try {
-    const { orderId, paymentId, signature } = req.body;
+    const user = await User.findById(req.user._id);
+
+    const { orderId, paymentId } = req.body;
 
     const order = await Order.findById(orderId);
     if (!order) {
@@ -158,6 +175,20 @@ exports.verifyPayment = async (req, res) => {
     const reserve = await Reserve.findById(order.reserveId);
     reserve.paid = true;
     await reserve.save();
+
+    const template = await successfulPaymentTemplate(
+      user.name,
+      user.email,
+      order.amount,
+      order.currency
+    );
+
+    await sendMail(
+      req.user.email,
+      "Payment Successful",
+      "Your payment was successful",
+      template
+    );
 
     return res.status(200).json({
       order,
