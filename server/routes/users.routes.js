@@ -16,18 +16,24 @@ const {
   adminMiddleware,
   authMiddleware,
 } = require("../middleware/auth.middleware");
-const router = require("./countries.routes");
 
-router.post(
-  "/login",
-  passport.authenticate("local", {
-    failureRedirect: `${process.env.FRONTEND_URL}/login`,
-    failureMessage: "Invalid username or password",
-  }),
-  function (req, res) {
-    res.status(200).json({ message: "Logged in successfully" });
-  }
-);
+route.post("/login", (req, res) => {
+  passport.authenticate("local", (err, user, options) => {
+    if (user) {
+      req.login(user, (error) => {
+        if (error) {
+          return res.status(500).json({ message: error });
+        } else {
+          return res
+            .status(200)
+            .json({ user: user, message: "Logged in successfully" });
+        }
+      });
+    } else {
+      return res.status(401).json({ message: options.message });
+    }
+  })(req, res);
+});
 
 route.get(
   "/auth/google",
