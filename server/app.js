@@ -4,9 +4,10 @@ const morgan = require("morgan");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongo");
 const { asyncErrorHandler, handleError } = require("./utils/error");
-const passport = require("passport");
 const cors = require("cors");
+const passport = require("passport");
 const fileUpload = require("express-fileupload");
+const cookieParser = require("cookie-parser");
 const {
   generateRandomTouristsSpots,
 } = require("./controllers/tourist-spot.controllers.js");
@@ -36,6 +37,7 @@ const app = express();
 // middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,

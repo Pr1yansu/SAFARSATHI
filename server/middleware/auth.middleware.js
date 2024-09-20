@@ -1,5 +1,5 @@
 exports.authMiddleware = function (req, res, next) {
-  console.log(req.isAuthenticated());
+  console.log(req.cookies);
 
   if (req.isAuthenticated()) {
     return next();
