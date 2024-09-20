@@ -77,6 +77,11 @@ app.use(
       dbName: process.env.MONGO_DB_NAME,
       ttl: 14 * 24 * 60 * 60,
     }),
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      httpOnly: true,
+    },
   })
 );
 
