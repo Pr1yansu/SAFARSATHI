@@ -77,6 +77,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.set("trust proxy", 1);
+
 // Session middleware configuration
 app.use(
   session({
@@ -88,6 +90,9 @@ app.use(
       dbName: process.env.MONGO_DB_NAME,
       ttl: 14 * 24 * 60 * 60,
     }),
+    cookie: {
+      sameSite: "none",
+    },
   })
 );
 
