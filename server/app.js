@@ -80,18 +80,18 @@ app.use((req, res, next) => {
 // Session middleware configuration
 app.use(
   session({
-    secret: process.env.SESSION_SECRET, // Secret for session encryption
+    secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     store: new MongoDBStore({
       mongoUrl: process.env.MONGO_URI,
       dbName: process.env.MONGO_DB_NAME,
-      ttl: 14 * 24 * 60 * 60, // Session expiry time (14 days)
+      ttl: 14 * 24 * 60 * 60,
     }),
     cookie: {
-      secure: process.env.NODE_ENV === "production", // Secure cookie for production (HTTPS)
-      sameSite: "none", // Allow cross-origin cookies
-      httpOnly: true, // Ensure cookie is not accessible via client-side JavaScript
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      httpOnly: true,
     },
   })
 );
