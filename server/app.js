@@ -88,10 +88,6 @@ app.use(
       dbName: process.env.MONGO_DB_NAME,
       ttl: 14 * 24 * 60 * 60,
     }),
-    cookie: {
-      secure: true,
-      httpOnly: true,
-    },
   })
 );
 
