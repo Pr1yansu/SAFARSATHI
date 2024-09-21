@@ -89,8 +89,7 @@ app.use(
       ttl: 14 * 24 * 60 * 60,
     }),
     cookie: {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: true,
       httpOnly: true,
     },
   })
