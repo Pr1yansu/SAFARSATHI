@@ -34,13 +34,15 @@ require("./config/cloudinary.config");
 //  Initialize express
 const app = express();
 
-// middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: function (origin, callback) {
+      if (process.env.WHITELISTED_DOMAINS.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: [
@@ -51,6 +53,11 @@ app.use(
     ],
   })
 );
+
+// middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 app.use(
   fileUpload({
