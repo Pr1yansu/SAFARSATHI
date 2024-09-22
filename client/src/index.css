@@ -3,18 +3,28 @@
 @tailwind components;
 @tailwind utilities;
 
+
 body {
     font-family: "Lato", system-ui;
     font-optical-sizing: auto;
+}
+
+* {
+    scrollbar-color: #8b5cf6 #e2e8f0;
+    scrollbar-width: thin;
+}
+
+*:hover {
+    scrollbar-color: #8b5cf6 #e2e8f0;
 }
 
 ::selection {
     background-color: transparent;
 }
 
-input::selection,
-textarea::selection {
-    @apply bg-violet-500/30;
+input::selection {
+    background-color: #8a5cf676;
+    padding: 2px;
 }
 
 svg,

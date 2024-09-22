@@ -2,10 +2,28 @@ import React, { useState } from "react";
 import { TbTrashX } from "react-icons/tb";
 
 const AddImage = ({ onChange, selectedImage, setSelectedImage }) => {
-  const [value, setValue] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+    if (file) {
+      onChange(file);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true); // Set dragging state
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false); // Reset dragging state
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
     if (file) {
       onChange(file);
     }
@@ -19,7 +37,14 @@ const AddImage = ({ onChange, selectedImage, setSelectedImage }) => {
       <p className="text-gray-600 mb-4">
         Help your guests visualize your place by sharing a clear image.
       </p>
-      <div className="border border-dashed border-gray-300 p-4 rounded-lg hover:bg-gray-50 transition">
+      <div
+        className={`border border-dashed border-gray-300 p-4 rounded-lg hover:bg-gray-50 transition ${
+          isDragging ? "bg-gray-100 border-blue-500" : ""
+        }`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         <label className="block cursor-pointer text-center">
           <span className="text-sm text-gray-500">
             Click to browse or drag and drop

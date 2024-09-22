@@ -27,12 +27,20 @@ export const touristSpotsApi = createApi({
     }),
     getTouristSpots: builder.query({
       query: (data) => {
-        if (data?.category) {
-          return `${baseUrl}/?page=${data?.page || 1}&category=${
-            data?.category
-          }`;
-        }
-        return `${baseUrl}/?page=${data?.page || 1}`;
+        const params = new URLSearchParams();
+
+        if (data?.page) params.append("page", data.page);
+        if (data?.category) params.append("category", data.category);
+        if (data?.location) params.append("location", data.location);
+        if (data?.checkin) params.append("checkin", data.checkin);
+        if (data?.checkout) params.append("checkout", data.checkout);
+        if (data?.guests) params.append("guests", data.guests);
+        if (data?.rooms) params.append("rooms", data.rooms);
+        if (data?.adults) params.append("adults", data.adults);
+        if (data?.children) params.append("children", data.children);
+        if (data?.infants) params.append("infants", data.infants);
+
+        return `${baseUrl}/?${params.toString()}`;
       },
       providesTags: ["TouristSpots"],
       transformResponse: (response) => {
@@ -119,6 +127,18 @@ export const touristSpotsApi = createApi({
       },
       transformResponse: (response) => response.review,
     }),
+    sendVerificationRequestToAdmins: builder.mutation({
+      query: (id) => ({
+        url: `/send-verification-request/${id}`,
+        method: "GET",
+      }),
+      transformErrorResponse: (response) => {
+        return response.data.message;
+      },
+      transformResponse: (response) => {
+        return response.message;
+      },
+    }),
   }),
 });
 
@@ -132,4 +152,5 @@ export const {
   useAddReviewMutation,
   useUpdateReviewMutation,
   useGetReviewByTouristSpotAndUserIdQuery,
+  useSendVerificationRequestToAdminsMutation,
 } = touristSpotsApi;

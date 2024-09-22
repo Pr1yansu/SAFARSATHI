@@ -9,6 +9,9 @@ import InfiniteLoader from "../components/ui/infinite-loader";
 import Loader from "../components/ui/loader";
 import { useInView } from "react-intersection-observer";
 import TouristSpotCard from "../components/ui/tourist-spot-card";
+import Button from "../components/ui/button";
+import { IoCloseOutline } from "react-icons/io5";
+import { debounce } from "lodash";
 
 const Home = () => {
   const { ref, inView } = useInView({
@@ -33,6 +36,14 @@ const Home = () => {
   } = useGetTouristSpotsQuery({
     page: page,
     category: searchParams.get("category"),
+    location: searchParams.get("location"),
+    checkin: searchParams.get("checkin"),
+    checkout: searchParams.get("checkout"),
+    guests: searchParams.get("guests"),
+    rooms: searchParams.get("rooms"),
+    adults: searchParams.get("adults"),
+    children: searchParams.get("children"),
+    infants: searchParams.get("infants"),
   });
 
   useEffect(() => {
@@ -52,19 +63,25 @@ const Home = () => {
   ]);
 
   useEffect(() => {
+    if (inView && hasMore) {
+      const debouncedFetch = debounce(() => {
+        setPage((prev) => prev + 1);
+      }, 500);
+
+      debouncedFetch();
+
+      return () => {
+        debouncedFetch.cancel();
+      };
+    }
+  }, [inView, hasMore]);
+
+  useEffect(() => {
     setSpots([]);
     setPage(1);
     setHasMore(true);
     refetchTouristSpots();
   }, [searchParams, refetchTouristSpots]);
-
-  useEffect(() => {
-    if (inView && hasMore) {
-      setTimeout(() => {
-        setPage((prev) => prev + 1);
-      }, 1000);
-    }
-  }, [inView, hasMore]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -102,11 +119,13 @@ const Home = () => {
               searchParams.get("category") === category._id && "border-zinc-200"
             )}
             onClick={() => {
-              if (searchParams.get("category") === category._id) {
-                setSearchParams({});
+              const newParams = new URLSearchParams(searchParams);
+              if (newParams.get("category") === category._id) {
+                newParams.delete("category");
               } else {
-                setSearchParams({ category: category._id });
+                newParams.set("category", category._id);
               }
+              setSearchParams(newParams);
             }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -120,6 +139,20 @@ const Home = () => {
           </motion.div>
         ))}
       </motion.div>
+      {Object.keys(Object.fromEntries(searchParams)).length > 0 && (
+        <Button
+          size="sm"
+          intent="ghost"
+          className={"mt-4 gap-2 font-semibold ml-auto"}
+          onClick={() => setSearchParams({})}
+        >
+          <IoCloseOutline
+            size={20}
+            className="border border-gray-300 rounded-md p-1"
+          />
+          Clear Filters
+        </Button>
+      )}
       <motion.div
         className="grid grid-cols-5 gap-4 mt-4 p-4 max-sm:grid-cols-1 max-md:grid-cols-2 max-lg:grid-cols-3 max-xl:grid-cols-4"
         variants={containerVariants}
@@ -156,7 +189,6 @@ const Home = () => {
             )}
           </>
         )}
-        {/* Skeleton loader for the next batch */}
         {touristSpotsIsFetching &&
           !touristSpotsIsLoading &&
           [...Array(5)].map((_, i) => (

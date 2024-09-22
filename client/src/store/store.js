@@ -8,6 +8,8 @@ import { touristSpotsApi } from "./apis/touristspots";
 import { countriesApi } from "./apis/countries";
 import { reserveApi } from "./apis/reserve";
 import { chartsApi } from "./apis/charts";
+import { newsLetterApi } from "./apis/news-letter";
+import { contactApi } from "./apis/contact";
 
 export const store = configureStore({
   reducer: {
@@ -16,8 +18,10 @@ export const store = configureStore({
     [countriesApi.reducerPath]: countriesApi.reducer,
     [touristSpotsApi.reducerPath]: touristSpotsApi.reducer,
     [reserveApi.reducerPath]: reserveApi.reducer,
-    likedSpots: likedSpotsReducer,
     [chartsApi.reducerPath]: chartsApi.reducer,
+    [newsLetterApi.reducerPath]: newsLetterApi.reducer,
+    [contactApi.reducerPath]: contactApi.reducer,
+    likedSpots: likedSpotsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -26,7 +30,9 @@ export const store = configureStore({
       countriesApi.middleware,
       touristSpotsApi.middleware,
       reserveApi.middleware,
-      chartsApi.middleware
+      chartsApi.middleware,
+      newsLetterApi.middleware,
+      contactApi.middleware
     ),
 });
 

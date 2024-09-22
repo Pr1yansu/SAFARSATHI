@@ -48,33 +48,14 @@ const RentHome = () => {
     lng: null,
     address: "",
   });
-
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [amenities, setAmenities] = useState({
-    wifi: {
-      count: 0,
-      icon: "IoWifiOutline",
-    },
-    tv: {
-      count: 0,
-      icon: "IoTvOutline",
-    },
-    kitchen: {
-      count: 0,
-      icon: "IoFastFoodOutline",
-    },
-    ac: {
-      count: 0,
-      icon: "IoSnowOutline",
-    },
-    heating: {
-      count: 0,
-      icon: "IoBonfireOutline",
-    },
-    parking: {
-      count: 0,
-      icon: "IoCarOutline",
-    },
+    wifi: { count: 0, icon: "IoWifiOutline" },
+    tv: { count: 0, icon: "IoTvOutline" },
+    kitchen: { count: 0, icon: "IoFastFoodOutline" },
+    ac: { count: 0, icon: "IoSnowOutline" },
+    heating: { count: 0, icon: "IoBonfireOutline" },
+    parking: { count: 0, icon: "IoCarOutline" },
   });
   const [moreInfo, setMoreInfo] = useState({
     guests: 1,
@@ -91,6 +72,8 @@ const RentHome = () => {
 
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 6;
+
+  const [loading, setLoading] = useState(false); // New loading state
 
   const actionLabel = useMemo(() => {
     return currentStep === totalSteps ? "Submit" : "Next";
@@ -161,6 +144,7 @@ const RentHome = () => {
   };
 
   const handleSubmit = async () => {
+    setLoading(true); // Set loading to true
     const formData = new FormData();
     formData.append("name", name);
     formData.append("category", selectedCategory);
@@ -178,6 +162,8 @@ const RentHome = () => {
       close();
     } catch (error) {
       console.error("Submission error:", error);
+    } finally {
+      setLoading(false); // Reset loading state
     }
   };
 
@@ -188,30 +174,12 @@ const RentHome = () => {
       setSelectedImage(null);
       setSelectedLocation({ lat: null, lng: null, address: "" });
       setAmenities({
-        wifi: {
-          count: 0,
-          icon: "AiOutlineWifi",
-        },
-        tv: {
-          count: 0,
-          icon: "RiTv2Line",
-        },
-        kitchen: {
-          count: 0,
-          icon: "MdOutlineKitchen",
-        },
-        ac: {
-          count: 0,
-          icon: "TbAirConditioning",
-        },
-        heating: {
-          count: 0,
-          icon: "IoMdBonfire",
-        },
-        parking: {
-          count: 0,
-          icon: "AiOutlineCar",
-        },
+        wifi: { count: 0, icon: "AiOutlineWifi" },
+        tv: { count: 0, icon: "RiTv2Line" },
+        kitchen: { count: 0, icon: "MdOutlineKitchen" },
+        ac: { count: 0, icon: "TbAirConditioning" },
+        heating: { count: 0, icon: "IoMdBonfire" },
+        parking: { count: 0, icon: "AiOutlineCar" },
       });
       setMoreInfo({
         guests: 1,
@@ -273,9 +241,7 @@ const RentHome = () => {
               {currentStep === 1 && (
                 <CategoryPicker
                   categories={categories}
-                  onChange={(category) => {
-                    setSelectedCategory(category);
-                  }}
+                  onChange={(category) => setSelectedCategory(category)}
                   selectedCategory={selectedCategory}
                 />
               )}
@@ -293,9 +259,7 @@ const RentHome = () => {
               )}
               {currentStep === 4 && (
                 <AddImage
-                  onChange={(image) => {
-                    setSelectedImage(image);
-                  }}
+                  onChange={(image) => setSelectedImage(image)}
                   selectedImage={selectedImage}
                   setSelectedImage={setSelectedImage}
                 />
@@ -324,16 +288,22 @@ const RentHome = () => {
                   onClick={handleBack}
                   className="bg-gray-300 px-4 py-2 rounded-md w-full"
                   intent="outline"
+                  disabled={loading} // Disable button if loading
                 >
                   {secondaryActionLabel}
                 </Button>
               )}
-              <Button
-                onClick={handleNext}
-                className="bg-purple-500 text-white px-4 py-2 rounded-md w-full"
-              >
-                {actionLabel}
-              </Button>
+              {loading ? ( // Show loading spinner instead of button
+                <Loader className="w-full h-10" />
+              ) : (
+                <Button
+                  onClick={handleNext}
+                  className="bg-purple-500 text-white px-4 py-2 rounded-md w-full"
+                  disabled={loading}
+                >
+                  {actionLabel}
+                </Button>
+              )}
             </div>
           </motion.div>
         </motion.div>

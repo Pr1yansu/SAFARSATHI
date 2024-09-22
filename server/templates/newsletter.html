@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to Our Newsletter!</title>
+  </head>
+  <body
+    style="
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #f8f8f8; border-radius: 5px; overflow: hidden"
+    >
+      <tr>
+        <td style="padding: 30px">
+          <h1 style="color: #2c3e50; text-align: center; margin-bottom: 20px">
+            Welcome to Our Newsletter!
+          </h1>
+          <p>Dear {{ email }},</p>
+          <p>
+            Thank you for subscribing to our newsletter! We're thrilled to have
+            you as part of our community. You'll now receive the latest updates,
+            exclusive offers, and travel tips straight to your inbox.
+          </p>
+          <p>To explore more, visit our website by clicking the link below:</p>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td align="center">
+                <a
+                  href="#"
+                  style="
+                    display: inline-block;
+                    background-color: #3498db;
+                    color: #ffffff;
+                    text-decoration: none;
+                    padding: 12px 24px;
+                    border-radius: 5px;
+                    font-weight: bold;
+                  "
+                  >Visit Our Website</a
+                >
+              </td>
+            </tr>
+          </table>
+          <p style="margin-top: 20px">
+            If you have any questions, feel free to <a href="#">contact us</a>.
+          </p>
+          <p>Thank you,</p>
+          <p style="font-weight: bold">The Tour Travel Team</p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

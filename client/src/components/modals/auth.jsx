@@ -8,10 +8,8 @@ import Separator from "../ui/separator";
 import Button from "../ui/button";
 import { useLoginMutation, useRegisterMutation } from "../../store/apis/user";
 import { toast } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
-  const navigate = useNavigate();
   const [register] = useRegisterMutation();
   const [login] = useLoginMutation();
   const { isOpen, variant, close, open } = useModal();

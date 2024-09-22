@@ -113,13 +113,20 @@ app.get(
   })
 );
 
-// Mounting all API route files
 app.use("/api/v1/countries", require("./routes/countries.routes"));
 app.use("/api/v1/users", require("./routes/users.routes"));
 app.use("/api/v1/categories", require("./routes/categories.routes.js"));
 app.use("/api/v1/tourist-spot", require("./routes/tourist-spots.routes.js"));
 app.use("/api/v1/reserves", require("./routes/reserve.routes.js"));
 app.use("/api/v1/charts", require("./routes/charts.routes.js"));
+app.use("/api/v1/news-letter", require("./routes/newsLetter.routes.js"));
+app.use("/api/v1/contact", require("./routes/contact.routes.js"));
+
+app.use((req, res, next) => {
+  const error = new Error(`Internal server error`);
+  res.status(404);
+  next(error);
+});
 
 // Global error handler middleware
 app.use((err, req, res, next) => {

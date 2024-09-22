@@ -5,8 +5,10 @@ import { IoCloseOutline } from "react-icons/io5";
 import Step from "../filter-steps/step";
 import Navigation from "../filter-steps/navigation";
 import Button from "../ui/button";
+import { useSearchParams } from "react-router-dom";
 
 const Filters = () => {
+  const [, setSearchParams] = useSearchParams();
   const { close, isOpen, variant } = useModal();
   const [selectedLocation, setSelectedLocation] = useState({
     lat: null,
@@ -36,19 +38,20 @@ const Filters = () => {
     setCurrentStep(0);
   };
 
-  const logData = () => {
-    console.log({
-      selectedLocation,
-      dateRange,
-      moreInfo,
-    });
-  };
-
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      logData();
+      setSearchParams({
+        location: `${selectedLocation.lat},${selectedLocation.lng}`,
+        checkin: dateRange[0].toISOString().split("T")[0],
+        checkout: dateRange[1].toISOString().split("T")[0],
+        guests: moreInfo.guests,
+        rooms: moreInfo.rooms,
+        adults: moreInfo.adults,
+        children: moreInfo.children,
+        infants: moreInfo.infants,
+      });
       close();
     }
   };

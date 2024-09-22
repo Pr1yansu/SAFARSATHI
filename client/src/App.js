@@ -14,19 +14,21 @@ import { useProfileQuery } from "./store/apis/user";
 import Loader from "./components/ui/loader";
 import ProfileModal from "./components/modals/profile";
 import RentHome from "./components/modals/rent-home";
-import Dashboard from "./pages/admin/dashboard";
-import Categories from "./pages/admin/categories";
 import AdminHeader from "./components/ui/admin-header";
-import AllListedHomes from "./pages/admin/all-listed";
-import AllUsers from "./pages/admin/all-users";
 import ForgotPassword from "./components/modals/forgot-password";
-import ResetPassword from "./pages/reset-password";
+import Footer from "./components/footer/footer";
 
 const Home = React.lazy(() => import("./pages/home"));
 const SingleListing = React.lazy(() => import("./pages/single-listing"));
 const FavoriteListings = React.lazy(() => import("./pages/favorite-listings"));
 const ListedHomes = React.lazy(() => import("./pages/listed-homes"));
 const ErrorPage = React.lazy(() => import("./pages/error-page"));
+const Contact = React.lazy(() => import("./pages/contact"));
+const ResetPassword = React.lazy(() => import("./pages/reset-password"));
+const AllListedHomes = React.lazy(() => import("./pages/admin/all-listed"));
+const AllUsers = React.lazy(() => import("./pages/admin/all-users"));
+const Categories = React.lazy(() => import("./pages/admin/categories"));
+const Dashboard = React.lazy(() => import("./pages/admin/dashboard"));
 
 const AuthProvider = ({ children }) => {
   const location = useLocation();
@@ -66,6 +68,7 @@ const App = () => {
       <Suspense fallback={<Loader />}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/contact" element={<Contact />} />
           <Route
             path="/about"
             element={
@@ -140,6 +143,7 @@ const App = () => {
       <ProfileModal />
       <RentHome />
       <ForgotPassword />
+      <Footer />
       <Toaster position="bottom-right" reverseOrder={false} gutter={8} />
     </BrowserRouter>
   );

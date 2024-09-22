@@ -5,7 +5,60 @@ const { formatValidationErrors } = require("../utils/error");
 const { faker } = require("@faker-js/faker");
 const categoryModel = require("../models/category.model");
 const User = require("../models/user.model");
-const LRUCache = require("../utils/cache");
+const Reservation = require("../models/reserve.model");
+const { sendMail } = require("../utils/mail.utils");
+const path = require("path");
+const { promises: fs } = require("fs");
+const logger = require("../utils/logger.utils");
+
+const verifyTourTemplate = async (touristSpot, user) => {
+  try {
+    const templatePath = path.join(__dirname, "../templates/verify-tour.html");
+
+    const touristSpotName = touristSpot.name;
+    const touristSpotId = touristSpot._id;
+    const spotImage = touristSpot.image.secure_url;
+    const verificationDate = new Date().toLocaleDateString();
+    const verifiedBy = user.name;
+
+    const html = await fs.readFile(templatePath, "utf-8");
+    return html
+      .replace(/{{ touristSpotName }}/g, touristSpotName)
+      .replace(/{{ touristSpotId }}/g, touristSpotId)
+      .replace(/{{ verificationDate }}/g, verificationDate)
+      .replace(/{{ verifiedBy }}/g, verifiedBy)
+      .replace(/{{ spotImage }}/g, spotImage);
+  } catch (error) {
+    logger.error("Error reading verify tour template:", error);
+    throw new Error("Failed to load email template");
+  }
+};
+
+const verificationRequestTemplate = async (touristSpot, user) => {
+  try {
+    const templatePath = path.join(
+      __dirname,
+      "../templates/verification-request.html"
+    );
+
+    const touristSpotName = touristSpot.name;
+    const touristSpotId = touristSpot._id;
+    const spotImage = touristSpot.image.secure_url;
+    const requestDate = new Date().toLocaleDateString();
+    const requestedBy = user.name;
+
+    const html = await fs.readFile(templatePath, "utf-8");
+    return html
+      .replace(/{{ touristSpotName }}/g, touristSpotName)
+      .replace(/{{ touristSpotId }}/g, touristSpotId)
+      .replace(/{{ requestDate }}/g, requestDate)
+      .replace(/{{ requestedBy }}/g, requestedBy)
+      .replace(/{{ spotImage }}/g, spotImage);
+  } catch (error) {
+    logger.error("Error reading verification request template:", error);
+    throw new Error("Failed to load email template");
+  }
+};
 
 exports.createTouristSpot = async (req, res) => {
   try {
@@ -70,7 +123,7 @@ exports.verifyTouristSpot = async (req, res) => {
     const { id } = req.params;
     const { verified } = req.body;
 
-    const touristSpot = await TouristSpots.findById(id);
+    const touristSpot = await TouristSpots.findById(id).populate("host");
 
     if (!touristSpot) {
       return res.status(404).json({ message: "Tourist spot not found" });
@@ -80,11 +133,37 @@ exports.verifyTouristSpot = async (req, res) => {
 
     await touristSpot.save();
 
+    const updatedBy = req.user.id;
+
+    const user = await User.findById(updatedBy);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (touristSpot.verified) {
+      const html = await verifyTourTemplate(touristSpot, user);
+
+      await sendMail(
+        touristSpot.host.email,
+        "Tourist Spot Verified",
+        "Your tourist spot has been verified",
+        html
+      );
+
+      return res.status(200).json({
+        touristSpot,
+        message: "Tourist spot verified successfully",
+      });
+    }
+
     return res.status(200).json({
-      touristSpot: touristSpot,
-      message: "Tourist spot verified successfully",
+      touristSpot,
+      message: "Tourist spot verification removed",
     });
   } catch (error) {
+    console.log(error);
+
     return res.status(500).json({ message: "Failed to verify tourist spot" });
   }
 };
@@ -102,11 +181,22 @@ exports.getTouristSpots = async (req, res) => {
       infants,
       page = 1,
       limit = 10,
+      checkin,
+      checkout,
     } = req.query;
 
     const query = {};
     if (category) query.category = category;
-    if (location) query.location = JSON.parse(location);
+
+    if (location) {
+      const [latitude, longitude] = location.split(",").map(Number);
+
+      query.location = {
+        $geoWithin: {
+          $centerSphere: [[longitude, latitude], 10 / 6378.1],
+        },
+      };
+    }
     if (price) query.price = { $lte: price };
     if (guests) query["info.guests"] = { $gte: guests };
     if (rooms) query["info.rooms"] = { $gte: rooms };
@@ -114,7 +204,21 @@ exports.getTouristSpots = async (req, res) => {
     if (children) query["info.children"] = { $gte: children };
     if (infants) query["info.infants"] = { $gte: infants };
 
+    if (checkin && checkout) {
+      const reservedSpotIds = await Reservation.find({
+        $or: [
+          {
+            startDate: { $lte: checkout },
+            endDate: { $gte: checkin },
+          },
+        ],
+      }).distinct("touristSpot");
+
+      query._id = { $nin: reservedSpotIds };
+    }
+
     const total = await TouristSpots.countDocuments(query);
+
     let touristSpots = await TouristSpots.find(query)
       .limit(Number(limit))
       .skip((Number(page) - 1) * limit)
@@ -377,3 +481,42 @@ exports.getReviewByTouristSpotAndUserId = async (req, res) => {
 exports.updateTouristSpot = async (req, res) => {};
 
 exports.deleteTouristSpot = async (req, res) => {};
+
+exports.sendVerificationRequestToAdmins = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const touristSpot = await TouristSpots.findById(id).populate("host");
+
+    if (!touristSpot) {
+      return res.status(404).json({ message: "Tourist spot not found" });
+    }
+
+    const admins = await User.find({ role: "admin" });
+
+    if (!admins) {
+      return res.status(404).json({ message: "There are no admins to verify" });
+    }
+
+    const html = await verificationRequestTemplate(touristSpot, req.user);
+
+    for (const admin of admins) {
+      await sendMail(
+        admin.email,
+        "Tourist Spot Verification Request",
+        "A tourist spot verification request has been sent",
+        html
+      );
+    }
+
+    return res.status(200).json({
+      message: "Verification request sent successfully",
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res
+      .status(500)
+      .json({ message: "Failed to send verification request" });
+  }
+};
