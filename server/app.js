@@ -89,10 +89,11 @@ app.use(
       ttl: 14 * 24 * 60 * 60,
     }),
     cookie: {
-      sameSite: "none",
-      secure: true,
-      httpOnly: false,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
     },
+    proxy: process.env.NODE_ENV === "production",
   })
 );
 
