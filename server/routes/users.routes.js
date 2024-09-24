@@ -50,10 +50,7 @@ route.get(
   })
 );
 
-route.get(
-  "/auth/github",
-  passport.authenticate("github", { scope: ["user:email"] })
-);
+route.get("/auth/github", passport.authenticate("github"));
 
 route.get(
   "/auth/github/callback",
