@@ -44,7 +44,7 @@ route.get(
   "/auth/google/callback",
   passport.authenticate("google", {
     failureMessage: "Cannot login to Google",
-    failureRedirect: `${process.env.FRONTEND_URL}/login`,
+    failureRedirect: `${process.env.FRONTEND_URL}`,
     successRedirect: `${process.env.FRONTEND_URL}`,
     successMessage: "Logged in with Google",
   })
@@ -56,7 +56,7 @@ route.get(
   "/auth/github/callback",
   passport.authenticate("github", {
     failureMessage: "Cannot login to Github",
-    failureRedirect: `${process.env.FRONTEND_URL}/login`,
+    failureRedirect: `${process.env.FRONTEND_URL}`,
     successRedirect: `${process.env.FRONTEND_URL}`,
     successMessage: "Logged in with Github",
   })
