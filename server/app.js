@@ -77,8 +77,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.set("trust proxy", 1);
-
 // Session middleware configuration
 app.use(
   session({
@@ -91,9 +89,9 @@ app.use(
       ttl: 14 * 24 * 60 * 60,
     }),
     cookie: {
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      secure: process.env.NODE_ENV === "production",
-      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+      httpOnly: false,
     },
   })
 );
