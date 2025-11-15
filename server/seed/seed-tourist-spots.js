@@ -20,11 +20,27 @@ module.exports = async function seedTouristSpots(count = 20) {
     return { created: 0, touristSpotIds: [] };
   }
 
+  // Realistic tourist spot names by category
+  const spotNames = {
+    beach: ["Sunset Beach Resort", "Paradise Cove", "Azure Bay Hotel", "Coral Reef Villas", "Ocean Breeze Resort"],
+    mountain: ["Alpine Peak Lodge", "Mountain View Retreat", "Summit Valley Inn", "Highland Chalets", "Rocky Ridge Resort"],
+    city: ["Downtown Loft", "City Center Apartment", "Urban Skyline Suite", "Metro Plaza Hotel", "Modern City Stay"],
+    forest: ["Woodland Cabin", "Forest Haven Lodge", "Pine Tree Retreat", "Nature's Edge Cottage", "Evergreen Resort"],
+    lake: ["Lakeside Villa", "Waterfront Cabin", "Lake View Lodge", "Tranquil Waters Resort", "Blue Lake House"],
+    desert: ["Desert Oasis Resort", "Sand Dunes Villa", "Mirage Hotel", "Canyon View Lodge", "Sahara Retreat"]
+  };
+
   const spots = [];
   for (let i = 0; i < count; i++) {
     const country = pick(Countries);
     const category = pick(categories);
     const host = pick(users);
+    
+    // Select name based on category or use generic
+    const categoryKey = category.label.toLowerCase();
+    const names = spotNames[categoryKey] || [faker.company.name() + " Resort"];
+    const name = pick(names) || `${faker.location.city()} ${faker.company.buzzAdjective()} Resort`;
+    
     const amenitiesBase = {
       wifi: { icon: "AiOutlineWifi" },
       tv: { icon: "RiTv2Line" },
@@ -35,26 +51,31 @@ module.exports = async function seedTouristSpots(count = 20) {
     };
     const amenities = {};
     Object.entries(amenitiesBase).forEach(([k,v]) => {
-      amenities[k] = { count: randInt(0,1), icon: v.icon };
+      amenities[k] = { count: randInt(0,2), icon: v.icon };
     });
 
+    // Use Unsplash for realistic travel images
+    const imageKeywords = ['travel', 'resort', 'hotel', 'vacation', 'beach', 'mountain', 'nature'];
+    const randomKeyword = pick(imageKeywords);
+    const imageUrl = `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random() * 200000000000)}?w=800&q=80&fit=crop&auto=format`;
+    
     spots.push({
       category: category._id,
-      name: faker.location.city(),
+      name: name,
       image: {
-        secure_url: faker.image.urlLoremFlickr({ category: "travel" }),
+        secure_url: imageUrl,
         public_id: faker.string.uuid()
       },
-      description: faker.lorem.paragraph(),
+      description: `Experience the perfect getaway at ${name}. ${faker.lorem.sentences(2)} Enjoy world-class amenities and breathtaking views.`,
       info: {
-        guests: randInt(1,10),
-        rooms: randInt(1,5),
-        adults: randInt(1,10),
-        children: randInt(0,5),
-        infants: randInt(0,3)
+        guests: randInt(2,8),
+        rooms: randInt(1,4),
+        adults: randInt(2,6),
+        children: randInt(0,3),
+        infants: randInt(0,2)
       },
       address: faker.location.streetAddress(),
-      price: faker.number.float({ min: 50, max: 500 }),
+      price: faker.number.float({ min: 80, max: 450, fractionDigits: 2 }),
       amenities,
       location: {
         lat: country.latlng[0],
@@ -62,7 +83,7 @@ module.exports = async function seedTouristSpots(count = 20) {
         address: country.name.common
       },
       host: host._id,
-      verified: false
+      verified: true
     });
   }
 

@@ -33,7 +33,6 @@ const Home = () => {
     data: touristSpots,
     isLoading: touristSpotsIsLoading,
     isFetching: touristSpotsIsFetching,
-    refetch: refetchTouristSpots,
   } = useGetTouristSpotsQuery({
     page: page,
     category: searchParams.get("category"),
@@ -71,11 +70,7 @@ const Home = () => {
         });
       }
     }
-  }, [
-    touristSpots?.touristSpots,
-    touristSpotsIsLoading,
-    touristSpotsIsFetching,
-  ]);
+  }, [touristSpots, touristSpotsIsLoading, touristSpotsIsFetching]);
 
   useEffect(() => {
     // Load next page only when the sentinel enters view (false -> true)
@@ -90,8 +85,7 @@ const Home = () => {
     setSpots([]);
     setPage(1);
     setHasMore(true);
-    refetchTouristSpots();
-  }, [searchParams, refetchTouristSpots]);
+  }, [searchParams]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
