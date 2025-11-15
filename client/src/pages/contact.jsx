@@ -4,7 +4,7 @@ import Textarea from "../components/ui/text-area";
 import Button from "../components/ui/button";
 import { useSendMessageMutation } from "../store/apis/contact";
 import toast from "react-hot-toast";
-import { LuLoader2 } from "react-icons/lu";
+import { BiLoaderCircle } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 
 const ContactForm = () => {
@@ -99,7 +99,7 @@ const ContactForm = () => {
           >
             {isLoading ? (
               <>
-                <LuLoader2 size={24} className="mr-2 animate-spin" /> Sending...
+                <BiLoaderCircle size={24} className="mr-2 animate-spin" /> Sending...
               </>
             ) : (
               "Send Message"
