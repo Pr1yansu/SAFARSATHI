@@ -4,10 +4,12 @@ const Category = require("../models/category.model");
 const { faker } = require("@faker-js/faker");
 const Countries = require("world-countries");
 const { log, pick, randInt } = require("./utils");
+const { searchUnsplashImages } = require("../utils/unsplash");
 
-module.exports = async function seedTouristSpots(count = 20) {
+module.exports = async function seedTouristSpots(count = 20, options = {}) {
+  const append = options.append || process.env.SEED_APPEND === "true";
   const existing = await TouristSpot.countDocuments();
-  if (existing > 0) {
+  if (!append && existing > 0) {
     log(`Tourist spots already exist (${existing}), skipping tourist spot seeding.`);
     const ids = await TouristSpot.find().distinct("_id");
     return { created: 0, touristSpotIds: ids };
@@ -31,6 +33,23 @@ module.exports = async function seedTouristSpots(count = 20) {
   };
 
   const spots = [];
+  // Pre-fetch Unsplash images per category to avoid hitting rate limits
+  const categoryImageCache = {};
+  async function getImageForCategory(label, i) {
+    try {
+      const key = (label || "travel").toLowerCase();
+      if (!categoryImageCache[key]) {
+        const query = `${key} travel resort hotel landscape`;
+        categoryImageCache[key] = await searchUnsplashImages({ query, perPage: 30 });
+      }
+      const arr = categoryImageCache[key];
+      if (Array.isArray(arr) && arr.length) {
+        return arr[(i + Math.floor(Math.random() * arr.length)) % arr.length];
+      }
+    } catch (_) {}
+    // Fallback to Unsplash Source when API unavailable
+    return `https://source.unsplash.com/featured/800x600?${encodeURIComponent(label || "travel")},travel,resort&sig=${i+1}`;
+  }
   for (let i = 0; i < count; i++) {
     const country = pick(Countries);
     const category = pick(categories);
@@ -54,10 +73,8 @@ module.exports = async function seedTouristSpots(count = 20) {
       amenities[k] = { count: randInt(0,2), icon: v.icon };
     });
 
-    // Use Unsplash for realistic travel images
-    const imageKeywords = ['travel', 'resort', 'hotel', 'vacation', 'beach', 'mountain', 'nature'];
-    const randomKeyword = pick(imageKeywords);
-    const imageUrl = `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random() * 200000000000)}?w=800&q=80&fit=crop&auto=format`;
+    // Get image URL from Unsplash API (with fallback)
+    const imageUrl = await getImageForCategory(category.label, i);
     
     spots.push({
       category: category._id,

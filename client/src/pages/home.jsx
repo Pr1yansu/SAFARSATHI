@@ -16,6 +16,7 @@ import { IoCloseOutline } from "react-icons/io5";
 const Home = () => {
   const { ref, inView } = useInView({
     threshold: 0.1,
+    rootMargin: "300px 0px",
   });
   const [searchParams, setSearchParams] = useSearchParams();
   const {
@@ -23,10 +24,15 @@ const Home = () => {
     isLoading,
     isFetching,
     error,
-  } = useGetCategoriesQuery();
+  } = useGetCategoriesQuery(undefined, {
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+  });
   const [page, setPage] = React.useState(1);
   const [spots, setSpots] = React.useState([]);
   const [hasMore, setHasMore] = React.useState(true);
+  const [canLoadMore, setCanLoadMore] = React.useState(false);
   const prevInViewRef = React.useRef(false);
 
   const {
@@ -44,6 +50,10 @@ const Home = () => {
     adults: searchParams.get("adults"),
     children: searchParams.get("children"),
     infants: searchParams.get("infants"),
+  }, {
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
   });
 
   useEffect(() => {
@@ -66,6 +76,9 @@ const Home = () => {
           ) {
             setHasMore(false);
           }
+          if (merged.length > 0) {
+            setCanLoadMore(true);
+          }
           return merged;
         });
       }
@@ -75,16 +88,17 @@ const Home = () => {
   useEffect(() => {
     // Load next page only when the sentinel enters view (false -> true)
     const enteredView = inView && !prevInViewRef.current;
-    if (enteredView && hasMore && !touristSpotsIsFetching) {
+    if (enteredView && hasMore && canLoadMore && !touristSpotsIsFetching) {
       setPage((prev) => prev + 1);
     }
     prevInViewRef.current = inView;
-  }, [inView, hasMore, touristSpotsIsFetching]);
+  }, [inView, hasMore, canLoadMore, touristSpotsIsFetching]);
 
   useEffect(() => {
     setSpots([]);
     setPage(1);
     setHasMore(true);
+    setCanLoadMore(false);
   }, [searchParams]);
 
   const containerVariants = {
@@ -102,7 +116,7 @@ const Home = () => {
     visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
   };
 
-  if (isLoading || isFetching) {
+  if (isLoading) {
     return <Loader />;
   }
 
