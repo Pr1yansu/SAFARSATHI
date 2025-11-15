@@ -11,7 +11,7 @@ import { useInView } from "react-intersection-observer";
 import TouristSpotCard from "../components/ui/tourist-spot-card";
 import Button from "../components/ui/button";
 import { IoCloseOutline } from "react-icons/io5";
-import { debounce } from "lodash";
+// Removed debounce to simplify page increment logic
 
 const Home = () => {
   const { ref, inView } = useInView({
@@ -49,11 +49,17 @@ const Home = () => {
   useEffect(() => {
     if (!touristSpotsIsLoading && !touristSpotsIsFetching) {
       if (touristSpots?.touristSpots) {
-        setSpots((prev) => [...prev, ...touristSpots.touristSpots]);
-
-        if (touristSpots?.touristSpots.length < 10) {
-          setHasMore(false);
-        }
+        setSpots((prev) => {
+          const merged = [...prev, ...touristSpots.touristSpots];
+          if (
+            (typeof touristSpots.total === "number" &&
+              merged.length >= touristSpots.total) ||
+            touristSpots.touristSpots.length < 10
+          ) {
+            setHasMore(false);
+          }
+          return merged;
+        });
       }
     }
   }, [
@@ -63,18 +69,12 @@ const Home = () => {
   ]);
 
   useEffect(() => {
-    if (inView && hasMore) {
-      const debouncedFetch = debounce(() => {
-        setPage((prev) => prev + 1);
-      }, 500);
-
-      debouncedFetch();
-
-      return () => {
-        debouncedFetch.cancel();
-      };
-    }
-  }, [inView, hasMore]);
+    // Trigger on enter: avoids chaining loads while still in view
+    if (!inView) return;
+    if (!hasMore) return;
+    if (touristSpotsIsFetching) return;
+    setPage((prev) => prev + 1);
+  }, [inView]);
 
   useEffect(() => {
     setSpots([]);
