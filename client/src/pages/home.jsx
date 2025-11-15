@@ -27,6 +27,7 @@ const Home = () => {
   const [page, setPage] = React.useState(1);
   const [spots, setSpots] = React.useState([]);
   const [hasMore, setHasMore] = React.useState(true);
+  const prevInViewRef = React.useRef(false);
 
   const {
     data: touristSpots,
@@ -69,12 +70,13 @@ const Home = () => {
   ]);
 
   useEffect(() => {
-    // Trigger on enter: avoids chaining loads while still in view
-    if (!inView) return;
-    if (!hasMore) return;
-    if (touristSpotsIsFetching) return;
-    setPage((prev) => prev + 1);
-  }, [inView]);
+    // Load next page only when the sentinel enters view (false -> true)
+    const enteredView = inView && !prevInViewRef.current;
+    if (enteredView && hasMore && !touristSpotsIsFetching) {
+      setPage((prev) => prev + 1);
+    }
+    prevInViewRef.current = inView;
+  }, [inView, hasMore, touristSpotsIsFetching]);
 
   useEffect(() => {
     setSpots([]);
@@ -208,7 +210,7 @@ const Home = () => {
       </motion.div>
       {hasMore ? (
         <div ref={ref} className="mt-20">
-          <InfiniteLoader />
+          {touristSpotsIsFetching ? <InfiniteLoader /> : null}
         </div>
       ) : (
         <>
