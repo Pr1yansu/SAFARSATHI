@@ -51,11 +51,19 @@ const Home = () => {
     if (!touristSpotsIsLoading && !touristSpotsIsFetching) {
       if (touristSpots?.touristSpots) {
         setSpots((prev) => {
-          const merged = [...prev, ...touristSpots.touristSpots];
+          const newSpots = touristSpots.touristSpots;
+          // Check for duplicates before merging
+          const uniqueNewSpots = newSpots.filter(
+            (newSpot) => !prev.some((existingSpot) => existingSpot._id === newSpot._id)
+          );
+          const merged = [...prev, ...uniqueNewSpots];
+          
+          // Check if we should stop fetching more
           if (
+            touristSpots.touristSpots.length === 0 ||
+            touristSpots.touristSpots.length < 10 ||
             (typeof touristSpots.total === "number" &&
-              merged.length >= touristSpots.total) ||
-            touristSpots.touristSpots.length < 10
+              merged.length >= touristSpots.total)
           ) {
             setHasMore(false);
           }
@@ -182,11 +190,7 @@ const Home = () => {
               <p>{error.message ? error : "An error occurred"}</p>
             ) : (
               spots?.map((touristSpot, index) => (
-                <React.Fragment key={touristSpot._id}>
-                  {touristSpot.verified && (
-                    <TouristSpotCard touristSpot={touristSpot} index={index} />
-                  )}
-                </React.Fragment>
+                <TouristSpotCard key={touristSpot._id} touristSpot={touristSpot} index={index} />
               ))
             )}
           </>
