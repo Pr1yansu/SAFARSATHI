@@ -1,6 +1,7 @@
 const Reserve = require("../models/reserve.model");
 const TouristSpot = require("../models/tourists-spots.model");
 const User = require("../models/user.model");
+const { faker } = require("@faker-js/faker");
 const { log, randInt, pick } = require("./utils");
 
 module.exports = async function seedReservations(count = 15) {
@@ -22,18 +23,18 @@ module.exports = async function seedReservations(count = 15) {
   for (let i = 0; i < count; i++) {
     const spot = pick(spots);
     const user = pick(users);
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() + randInt(1,30));
+    const startDate = faker.date.soon({ days: 30 });
+    const nights = randInt(1, 7);
     const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + randInt(1,7));
-    const totalPrice = (endDate - startDate) / (1000*60*60*24) * spot.price;
+    endDate.setDate(startDate.getDate() + nights);
+    const totalPrice = nights * spot.price;
     reserves.push({
       touristSpot: spot._id,
       user: user._id,
       startDate,
       endDate,
       totalPrice: Math.round(totalPrice),
-      paid: randInt(0,1) === 1
+      paid: randInt(0, 1) === 1,
     });
   }
 

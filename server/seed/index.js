@@ -6,6 +6,7 @@ const { connect, log, writeCsvSummary } = require("./utils");
 const seedUsers = require("./seed-users");
 const seedCategories = require("./seed-categories");
 const seedTouristSpots = require("./seed-tourist-spots");
+const seedReviews = require("./seed-reviews");
 const seedReservations = require("./seed-reservations");
 const seedOrders = require("./seed-orders");
 const seedNewsletter = require("./seed-newsletter");
@@ -14,6 +15,7 @@ const seedNewsletter = require("./seed-newsletter");
 const COUNTS = {
   USERS: parseInt(process.env.SEED_USERS || "8", 10),
   TOURIST_SPOTS: parseInt(process.env.SEED_TOURIST_SPOTS || "20", 10),
+  REVIEWS_MAX_PER_SPOT: parseInt(process.env.SEED_REVIEWS_MAX_PER_SPOT || "5", 10),
   RESERVATIONS: parseInt(process.env.SEED_RESERVATIONS || "15", 10),
   ORDERS: parseInt(process.env.SEED_ORDERS || "10", 10),
   NEWSLETTER: parseInt(process.env.SEED_NEWSLETTER || "12", 10)
@@ -31,6 +33,7 @@ async function run() {
   const usersResult = await seedUsers(COUNTS.USERS);
   const categoriesResult = await seedCategories(usersResult.adminId);
   const spotsResult = await seedTouristSpots(COUNTS.TOURIST_SPOTS);
+  const reviewsResult = await seedReviews(COUNTS.REVIEWS_MAX_PER_SPOT);
   const reservationsResult = await seedReservations(COUNTS.RESERVATIONS);
   const ordersResult = await seedOrders(COUNTS.ORDERS);
   const newsletterResult = await seedNewsletter(COUNTS.NEWSLETTER);
@@ -39,6 +42,7 @@ async function run() {
     { entity: "users", count: usersResult.created, notes: "Includes 1 admin" },
     { entity: "categories", count: categoriesResult.created, notes: "Tour categories" },
     { entity: "tourist_spots", count: spotsResult.created, notes: "Random faker data" },
+    { entity: "reviews", count: reviewsResult.created, notes: `Max ${COUNTS.REVIEWS_MAX_PER_SPOT} per spot` },
     { entity: "reservations", count: reservationsResult.created, notes: "Future dated" },
     { entity: "orders", count: ordersResult.created, notes: "Linked to paid reservations" },
     { entity: "newsletter", count: newsletterResult.created, notes: "Sample subscribers" }

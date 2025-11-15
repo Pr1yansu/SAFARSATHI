@@ -1,7 +1,7 @@
 const Order = require("../models/order.model");
 const Reserve = require("../models/reserve.model");
+const { faker } = require("@faker-js/faker");
 const { log, pick } = require("./utils");
-const short = require("short-uuid");
 
 module.exports = async function seedOrders(count = 10) {
   const existing = await Order.countDocuments();
@@ -21,12 +21,14 @@ module.exports = async function seedOrders(count = 10) {
   for (let i = 0; i < count; i++) {
     const reserve = pick(paidReserves);
     orders.push({
-      razorpayOrderId: short.generate(),
+      razorpayOrderId: `order_${faker.string.alphanumeric({ length: 14 })}`,
+      razorpayPaymentId: `pay_${faker.string.alphanumeric({ length: 14 })}`,
+      razorpaySignature: faker.string.alphanumeric({ length: 64 }),
       reserveId: reserve._id,
       user: reserve.user._id,
       amount: reserve.totalPrice,
       status: "paid",
-      createdAt: new Date()
+      createdAt: faker.date.recent({ days: 14 })
     });
   }
 

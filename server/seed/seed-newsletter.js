@@ -1,5 +1,6 @@
 const Newsletter = require("../models/newsletter.model");
-const { log, randInt } = require("./utils");
+const { faker } = require("@faker-js/faker");
+const { log } = require("./utils");
 
 module.exports = async function seedNewsletter(count = 12) {
   const existing = await Newsletter.countDocuments();
@@ -11,7 +12,7 @@ module.exports = async function seedNewsletter(count = 12) {
 
   const entries = [];
   for (let i = 0; i < count; i++) {
-    entries.push({ email: `subscriber${i + 1}_${randInt(100,999)}@example.com` });
+    entries.push({ email: faker.internet.email() });
   }
   const inserted = await Newsletter.create(entries);
   log(`Inserted ${inserted.length} newsletter subscribers.`);

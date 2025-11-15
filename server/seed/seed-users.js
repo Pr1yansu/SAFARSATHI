@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/user.model");
-const { log, randInt } = require("./utils");
+const { faker } = require("@faker-js/faker");
+const { log } = require("./utils");
 
 module.exports = async function seedUsers(count = 8) {
   const existing = await User.countDocuments();
@@ -19,12 +20,12 @@ module.exports = async function seedUsers(count = 8) {
     role: "admin",
   });
 
+  const defaultPasswordHash = await bcrypt.hash("User@123", 10);
   for (let i = 0; i < count; i++) {
-    const password = await bcrypt.hash(`User${i + 1}@${randInt(100,999)}`, 10);
     users.push({
-      name: `Sample User ${i + 1}`,
-      email: `user${i + 1}@example.com`,
-      password,
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      password: defaultPasswordHash,
       role: "user",
     });
   }
