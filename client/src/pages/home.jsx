@@ -5,19 +5,13 @@ import { useSearchParams } from "react-router-dom";
 import classNames from "classnames";
 import { motion } from "framer-motion";
 import { useGetTouristSpotsQuery } from "../store/apis/touristspots";
-import InfiniteLoader from "../components/ui/infinite-loader";
 import Loader from "../components/ui/loader";
-import { useInView } from "react-intersection-observer";
 import TouristSpotCard from "../components/ui/tourist-spot-card";
 import Button from "../components/ui/button";
 import { IoCloseOutline } from "react-icons/io5";
-// Removed debounce to simplify page increment logic
+// Pagination view (replaces infinite scroll)
 
 const Home = () => {
-  const { ref, inView } = useInView({
-    threshold: 0.1,
-    rootMargin: "300px 0px",
-  });
   const [searchParams, setSearchParams] = useSearchParams();
   const {
     data: categories,
@@ -30,10 +24,8 @@ const Home = () => {
     refetchOnReconnect: false,
   });
   const [page, setPage] = React.useState(1);
+  const [limit] = React.useState(10);
   const [spots, setSpots] = React.useState([]);
-  const [hasMore, setHasMore] = React.useState(true);
-  const [canLoadMore, setCanLoadMore] = React.useState(false);
-  const prevInViewRef = React.useRef(false);
 
   const {
     data: touristSpots,
@@ -41,6 +33,7 @@ const Home = () => {
     isFetching: touristSpotsIsFetching,
   } = useGetTouristSpotsQuery({
     page: page,
+    limit: limit,
     category: searchParams.get("category"),
     location: searchParams.get("location"),
     checkin: searchParams.get("checkin"),
@@ -57,48 +50,13 @@ const Home = () => {
   });
 
   useEffect(() => {
-    if (!touristSpotsIsLoading && !touristSpotsIsFetching) {
-      if (touristSpots?.touristSpots) {
-        setSpots((prev) => {
-          const newSpots = touristSpots.touristSpots;
-          // Check for duplicates before merging
-          const uniqueNewSpots = newSpots.filter(
-            (newSpot) => !prev.some((existingSpot) => existingSpot._id === newSpot._id)
-          );
-          const merged = [...prev, ...uniqueNewSpots];
-          
-          // Check if we should stop fetching more
-          if (
-            touristSpots.touristSpots.length === 0 ||
-            touristSpots.touristSpots.length < 10 ||
-            (typeof touristSpots.total === "number" &&
-              merged.length >= touristSpots.total)
-          ) {
-            setHasMore(false);
-          }
-          if (merged.length > 0) {
-            setCanLoadMore(true);
-          }
-          return merged;
-        });
-      }
+    if (!touristSpotsIsLoading && touristSpots?.touristSpots) {
+      setSpots(touristSpots.touristSpots);
     }
-  }, [touristSpots, touristSpotsIsLoading, touristSpotsIsFetching]);
+  }, [touristSpots, touristSpotsIsLoading]);
 
   useEffect(() => {
-    // Load next page only when the sentinel enters view (false -> true)
-    const enteredView = inView && !prevInViewRef.current;
-    if (enteredView && hasMore && canLoadMore && !touristSpotsIsFetching) {
-      setPage((prev) => prev + 1);
-    }
-    prevInViewRef.current = inView;
-  }, [inView, hasMore, canLoadMore, touristSpotsIsFetching]);
-
-  useEffect(() => {
-    setSpots([]);
     setPage(1);
-    setHasMore(true);
-    setCanLoadMore(false);
   }, [searchParams]);
 
   const containerVariants = {
@@ -203,38 +161,26 @@ const Home = () => {
             )}
           </>
         )}
-        {touristSpotsIsFetching &&
-          !touristSpotsIsLoading &&
-          [...Array(5)].map((_, i) => (
-            <div key={i} className="bg-white rounded-md animate-pulse">
-              <div className="mt-4">
-                <div className="w-full h-64 bg-gray-300 rounded-md"></div>
-              </div>
-              <div className="py-4 space-y-2">
-                <div className="h-4 bg-gray-300 rounded-md"></div>
-                <div className="flex items-baseline gap-3">
-                  <div className="h-4 bg-gray-300 rounded-md w-1/2"></div>
-                  <div className="h-4 bg-gray-300 rounded-md w-1/2"></div>
-                </div>
-              </div>
-            </div>
-          ))}
       </motion.div>
-      {hasMore ? (
-        <div ref={ref} className="mt-20">
-          {touristSpotsIsFetching ? <InfiniteLoader /> : null}
-        </div>
-      ) : (
-        <>
-          {!error && (
-            <div className="flex justify-center items-center py-4">
-              <p className="text-sm font-semibold text-gray-500">
-                No more data
-              </p>
-            </div>
+      {/* Pagination Controls */}
+      <div className="mt-6 flex items-center justify-between p-4">
+        <p className="text-sm text-gray-600">
+          {touristSpots?.total ? (
+            <>Showing {Math.min((page - 1) * limit + 1, touristSpots.total)}–{Math.min(page * limit, touristSpots.total)} of {touristSpots.total}</>
+          ) : (
+            <>Showing 0–0 of 0</>
           )}
-        </>
-      )}
+        </p>
+        <div className="flex items-center gap-2">
+          <Button size="sm" intent="ghost" disabled={page === 1 || touristSpotsIsFetching} onClick={() => setPage((p) => Math.max(1, p - 1))}>
+            Previous
+          </Button>
+          <span className="text-sm font-semibold text-gray-700">Page {page}{touristSpots?.total ? ` of ${Math.max(1, Math.ceil(touristSpots.total / limit))}` : ""}</span>
+          <Button size="sm" intent="ghost" disabled={touristSpots?.total ? page >= Math.ceil(touristSpots.total / limit) || touristSpotsIsFetching : true} onClick={() => setPage((p) => p + 1)}>
+            Next
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
