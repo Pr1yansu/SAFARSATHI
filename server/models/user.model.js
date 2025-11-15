@@ -61,8 +61,6 @@ userSchema.methods.comparePasswords = async function (password) {
   return bcrypt.compare(password, this.password);
 };
 
-userSchema.index({ email: 1 }, { unique: true });
-
 userSchema.methods.toJSON = function () {
   const user = this.toObject();
   delete user.password;
