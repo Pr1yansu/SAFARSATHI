@@ -5,7 +5,6 @@ import { useSearchParams } from "react-router-dom";
 import classNames from "classnames";
 import { motion } from "framer-motion";
 import { useGetTouristSpotsQuery } from "../store/apis/touristspots";
-import Loader from "../components/ui/loader";
 import TouristSpotCard from "../components/ui/tourist-spot-card";
 import Button from "../components/ui/button";
 import { IoCloseOutline, IoSearchOutline } from "react-icons/io5";
@@ -19,7 +18,7 @@ const Home = () => {
 
   const {
     data: categories,
-    isLoading,
+    isLoading: categoriesIsLoading,
   } = useGetCategoriesQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
@@ -72,10 +71,6 @@ const Home = () => {
     hidden: { opacity: 0, y: 15 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
   };
-
-  if (isLoading) {
-    return <Loader />;
-  }
 
   const activeCategory = searchParams.get("category");
 
@@ -210,47 +205,55 @@ const Home = () => {
             )}
           </div>
 
-          <motion.div
-            className="flex overflow-x-auto pb-3 pt-1 gap-3 scrollbar-none"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {categories?.map((category) => {
-              const isSelected = activeCategory === category._id;
-              return (
-                <motion.button
-                  key={category._id}
-                  variants={itemVariants}
-                  onClick={() => {
-                    const newParams = new URLSearchParams(searchParams);
-                    if (newParams.get("category") === category._id) {
-                      newParams.delete("category");
-                    } else {
-                      newParams.set("category", category._id);
-                    }
-                    setSearchParams(newParams);
-                  }}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  className={classNames(
-                    "flex items-center gap-2.5 px-4 py-2.5 rounded-2xl cursor-pointer transition-all duration-200 flex-shrink-0 text-xs sm:text-sm font-semibold select-none border",
-                    isSelected
-                      ? "gradient-bg-primary text-white border-transparent shadow-md shadow-indigo-500/25"
-                      : "bg-white text-slate-700 border-slate-200/80 hover:border-indigo-300 hover:bg-slate-50 shadow-xs"
-                  )}
-                >
-                  <div className={classNames(
-                    "w-7 h-7 rounded-xl flex items-center justify-center transition-colors shrink-0",
-                    isSelected ? "bg-white/20 text-white fill-white" : "bg-slate-100 text-slate-600"
-                  )}>
-                    <IconPickerItem value={category.icon} size={16} color={isSelected ? "#FFFFFF" : "#475569"} />
-                  </div>
-                  <span>{category.label}</span>
-                </motion.button>
-              );
-            })}
-          </motion.div>
+          {categoriesIsLoading ? (
+            <div className="flex gap-3 overflow-x-auto pb-3 pt-1 scrollbar-none">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="h-10 w-32 bg-slate-200/80 rounded-2xl animate-pulse flex-shrink-0"></div>
+              ))}
+            </div>
+          ) : (
+            <motion.div
+              className="flex overflow-x-auto pb-3 pt-1 gap-3 scrollbar-none"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {categories?.map((category) => {
+                const isSelected = activeCategory === category._id;
+                return (
+                  <motion.button
+                    key={category._id}
+                    variants={itemVariants}
+                    onClick={() => {
+                      const newParams = new URLSearchParams(searchParams);
+                      if (newParams.get("category") === category._id) {
+                        newParams.delete("category");
+                      } else {
+                        newParams.set("category", category._id);
+                      }
+                      setSearchParams(newParams);
+                    }}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    className={classNames(
+                      "flex items-center gap-2.5 px-4 py-2.5 rounded-2xl cursor-pointer transition-all duration-200 flex-shrink-0 text-xs sm:text-sm font-semibold select-none border",
+                      isSelected
+                        ? "gradient-bg-primary text-white border-transparent shadow-md shadow-indigo-500/25"
+                        : "bg-white text-slate-700 border-slate-200/80 hover:border-indigo-300 hover:bg-slate-50 shadow-xs"
+                    )}
+                  >
+                    <div className={classNames(
+                      "w-7 h-7 rounded-xl flex items-center justify-center transition-colors shrink-0",
+                      isSelected ? "bg-white/20 text-white fill-white" : "bg-slate-100 text-slate-600"
+                    )}>
+                      <IconPickerItem value={category.icon} size={16} color={isSelected ? "#FFFFFF" : "#475569"} />
+                    </div>
+                    <span>{category.label}</span>
+                  </motion.button>
+                );
+              })}
+            </motion.div>
+          )}
         </section>
 
         {/* Tourist Spots Grid */}
