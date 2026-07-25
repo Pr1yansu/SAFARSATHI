@@ -49,18 +49,14 @@ const AuthProvider = ({ children }) => {
   }, [profile, location.pathname, navigate, isLoading]);
 
   if (isLoading) {
-    return <Loader />;
+    return <Loader text="Verifying authentication..." />;
   }
 
   return <>{children}</>;
 };
 
 const App = () => {
-  const { data: profile, isLoading } = useProfileQuery();
-
-  if (isLoading) {
-    return <Loader />;
-  }
+  const { data: profile } = useProfileQuery();
 
   return (
     <BrowserRouter>
