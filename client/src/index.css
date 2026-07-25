@@ -1,55 +1,110 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: #1e293b;
+    background-color: #f8fafc;
+    overflow-x: hidden;
+  }
 
-body {
-    font-family: "Lato", system-ui;
-    font-optical-sizing: auto;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  }
 }
 
+/* Custom Scrollbar */
 * {
-    scrollbar-color: #8b5cf6 #e2e8f0;
-    scrollbar-width: thin;
+  scrollbar-color: #6366f1 #f1f5f9;
+  scrollbar-width: thin;
 }
 
 *:hover {
-    scrollbar-color: #8b5cf6 #e2e8f0;
+  scrollbar-color: #4f46e5 #e2e8f0;
 }
 
 ::selection {
-    background-color: transparent;
+  background-color: rgba(99, 102, 241, 0.2);
+  color: #4338ca;
 }
 
 input::selection {
-    background-color: #8a5cf676;
-    padding: 2px;
+  background-color: rgba(99, 102, 241, 0.3);
 }
 
-svg,
-circle,
-g {
-    outline: none;
+svg, circle, g {
+  outline: none;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-family: "Montserrat", system-ui;
-    font-optical-sizing: auto;
+/* Glassmorphism & Custom Effects */
+.glass-nav {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
 }
 
+.glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.glass-badge {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-text-amber {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-bg-primary {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+.gradient-bg-hover {
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+}
+
+.gradient-hero-bg {
+  background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.12) 0%, rgba(248, 250, 252, 0) 70%);
+}
+
+.shadow-glow {
+  box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.3);
+}
+
+.shadow-card {
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+}
+
+.shadow-card-hover {
+  box-shadow: 0 20px 35px -5px rgba(15, 23, 42, 0.12), 0 8px 15px -3px rgba(15, 23, 42, 0.08);
+}
+
+/* Hide Leaflet watermark & controls nicely */
 .leaflet-bottom,
 .leaflet-control,
 .leaflet-pane,
 .leaflet-top {
-    z-index: 0 !important;
+  z-index: 0 !important;
 }
 
 .leaflet-control-attribution {
-    display: none !important;
-}
+  display: none !important;
+}

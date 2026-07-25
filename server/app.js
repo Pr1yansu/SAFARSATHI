@@ -3,6 +3,7 @@ require("dotenv").config({ path: "./.env" });
 
 // Import required packages and modules
 const express = require("express");
+const os = require("os");
 const morgan = require("morgan");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongo");
@@ -10,8 +11,12 @@ const passport = require("passport");
 const fileUpload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const { xss } = require("express-xss-sanitizer");
 const { asyncErrorHandler, handleError } = require("./utils/error");
 const connectDB = require("./config/db.config");
+const setupSwagger = require("./config/swagger");
 const {
   generateRandomTouristsSpots,
 } = require("./controllers/tourist-spot.controllers.js");
@@ -30,6 +35,11 @@ require("./config/cloudinary.config");
 
 // Initialize express application
 const app = express();
+
+// Security Middleware
+app.use(helmet());
+app.use(mongoSanitize());
+app.use(xss());
 
 // CORS setup with custom origin whitelist
 app.use(
@@ -61,7 +71,7 @@ app.use(cookieParser()); // Parse cookies
 app.use(
   fileUpload({
     useTempFiles: true,
-    tempFileDir: "/tmp/",
+    tempFileDir: os.tmpdir(),
     limits: { fileSize: 10 * 1024 * 1024 }, // Limit file size to 10MB
   })
 );
@@ -105,6 +115,8 @@ app.use(passport.session());
 app.use(morgan("dev"));
 
 // Routes setup
+setupSwagger(app);
+
 app.get(
   "/",
   asyncErrorHandler(async (req, res, next) => {
@@ -120,6 +132,7 @@ app.use("/api/v1/reserves", require("./routes/reserve.routes.js"));
 app.use("/api/v1/charts", require("./routes/charts.routes.js"));
 app.use("/api/v1/news-letter", require("./routes/newsLetter.routes.js"));
 app.use("/api/v1/contact", require("./routes/contact.routes.js"));
+app.use("/api/v1/ai", require("./routes/aiRoutes.js"));
 
 app.use((req, res, next) => {
   const error = new Error(`Internal server error`);

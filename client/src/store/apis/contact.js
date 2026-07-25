@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const baseUrl = `${process.env.REACT_APP_BACKEND_URL}/api/v1/contact`;
+const baseUrl = `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}/api/v1/contact`;
 
 export const contactApi = createApi({
   reducerPath: "contactApi",

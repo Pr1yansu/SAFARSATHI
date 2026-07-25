@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const baseUrl = `${process.env.REACT_APP_BACKEND_URL}/api/v1/charts`;
+const baseUrl = `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}/api/v1/charts`;
 
 export const chartsApi = createApi({
   reducerPath: "chartsApi",

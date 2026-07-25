@@ -2,72 +2,47 @@ import React from "react";
 import cn from "classnames";
 import { cva } from "class-variance-authority";
 import { FaGoogle, FaGithub } from "react-icons/fa";
-const buttonVariants = cva(["duration-150 border"], {
-  variants: {
-    intent: {
-      primary: [
-        "bg-purple-500",
-        "text-white",
-        "hover:bg-purple-600",
-        "border-transparent",
-      ],
-      secondary: [
-        "bg-gray-200",
-        "text-gray-800",
-        "hover:bg-gray-300",
-        "border-transparent",
-      ],
-      outline: [
-        "bg-transparent",
-        "text-purple-500",
-        "hover:bg-purple-50",
-        "border-purple-500",
-      ],
-      danger: [
-        "bg-red-500",
-        "text-white",
-        "hover:bg-red-600",
-        "border-transparent",
-      ],
-      ghost: [
-        "bg-transparent",
-        "text-gray-800",
-        "hover:bg-gray-100",
-        "border-transparent",
-      ],
-      google: [
-        "bg-white",
-        "text-gray-800",
-        "hover:bg-gray-100",
-        "border-gray-200",
-        "flex items-center justify-center gap-2",
-      ],
-      github: [
-        "bg-black",
-        "text-white",
-        "hover:bg-gray-800",
-        "border-transparent",
-        "flex items-center justify-center gap-2",
-      ],
+
+const buttonVariants = cva(
+  ["transition-all duration-200 font-medium active:scale-95 disabled:pointer-events-none disabled:opacity-50"],
+  {
+    variants: {
+      intent: {
+        primary: [
+          "bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:from-indigo-700 hover:to-violet-700 shadow-md hover:shadow-lg hover:shadow-indigo-500/25 border-transparent",
+        ],
+        secondary: [
+          "bg-slate-100 text-slate-800 hover:bg-slate-200 border-transparent",
+        ],
+        outline: [
+          "bg-white/80 backdrop-blur-sm text-indigo-600 border-indigo-200 hover:border-indigo-500 hover:bg-indigo-50/50 shadow-xs",
+        ],
+        danger: [
+          "bg-rose-500 text-white hover:bg-rose-600 shadow-md hover:shadow-rose-500/25 border-transparent",
+        ],
+        ghost: [
+          "bg-transparent text-slate-700 hover:bg-slate-100/80 border-transparent",
+        ],
+        google: [
+          "bg-white text-slate-700 hover:bg-slate-50 border-slate-200 shadow-xs flex items-center justify-center gap-2",
+        ],
+        github: [
+          "bg-slate-900 text-white hover:bg-slate-800 border-transparent shadow-xs flex items-center justify-center gap-2",
+        ],
+      },
+      size: {
+        sm: ["px-3.5", "py-1.5", "text-xs", "rounded-lg"],
+        md: ["px-5", "py-2.5", "text-sm", "rounded-xl"],
+        lg: ["px-7", "py-3.5", "text-base", "rounded-2xl"],
+        icon: ["p-2.5", "rounded-xl", "text-lg", "hover:bg-slate-100"],
+      },
     },
-    size: {
-      sm: ["px-3", "py-2", "text-sm"],
-      md: ["px-4", "py-2", "text-base"],
-      lg: ["px-6", "py-3", "text-lg"],
-      icon: ["p-2", "rounded-full", "text-lg", "hover:bg-gray-200"],
-    },
-  },
-  compoundVariants: [
-    {
+    defaultVariants: {
       intent: "primary",
       size: "md",
     },
-  ],
-  defaultVariants: {
-    intent: "primary",
-    size: "md",
-  },
-});
+  }
+);
 
 const Button = ({
   children,
@@ -80,16 +55,17 @@ const Button = ({
     <button
       className={cn(
         buttonVariants({ intent, size }),
-        "rounded-full flex items-center justify-center disabled:opacity-50",
+        "flex items-center justify-center gap-2 cursor-pointer select-none",
         className
       )}
       {...props}
     >
       {children}
-      {intent === "google" && <FaGoogle className="text-red-500" />}
-      {intent === "github" && <FaGithub />}
+      {intent === "google" && <FaGoogle className="text-rose-500 text-base" />}
+      {intent === "github" && <FaGithub className="text-white text-base" />}
     </button>
   );
 };
 
 export default Button;
+

@@ -29,6 +29,7 @@ const AllListedHomes = React.lazy(() => import("./pages/admin/all-listed"));
 const AllUsers = React.lazy(() => import("./pages/admin/all-users"));
 const Categories = React.lazy(() => import("./pages/admin/categories"));
 const Dashboard = React.lazy(() => import("./pages/admin/dashboard"));
+const AIPlanner = React.lazy(() => import("./components/AIPlanner"));
 
 const AuthProvider = ({ children }) => {
   const location = useLocation();
@@ -130,6 +131,8 @@ const App = () => {
             path="/tourist-spot/:id"
             element={<SingleListing profile={profile} />}
           />
+
+          <Route path="/planner" element={<AIPlanner />} />
 
           {profile ? null : (
             <Route path="/reset-password/:id" element={<ResetPassword />} />

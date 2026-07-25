@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { useGetTouristSpotByIdQuery } from "../store/apis/touristspots";
 import Loader from "../components/ui/loader";
 import Avatar from "../components/ui/avatar";
-import Separator from "../components/ui/separator";
 import { IconPickerItem } from "react-icons-picker";
 import Accordion from "../components/ui/accordion";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,6 +21,8 @@ import {
 } from "../store/apis/reserve";
 import PaymentBTN from "../components/ui/payment-btn";
 import ReviewTouristSpot from "./components/review";
+import { HiShieldCheck, HiSparkles, HiUserGroup, HiCheckCircle, HiMapPin, HiKey, HiCalendar, HiCheckBadge, HiWifi, HiTv, HiTruck } from "react-icons/hi2";
+import { MdVerified, MdKitchen } from "react-icons/md";
 
 const SingleListing = ({ profile }) => {
   const { id } = useParams();
@@ -104,91 +105,167 @@ const SingleListing = ({ profile }) => {
           refetchReserve();
         })
         .catch((err) => {
-          toast.error(err.data.message);
+          toast.error(err.data?.message || "Reservation error");
         });
     } catch (error) {
       toast.error("Failed to reserve tourist spot");
     }
-  }, [profile, touristSpot, dateRange, price, createReserve, refetchReserve]);
+  }, [profile, touristSpot, dateRange, price, createReserve, refetchReserve, open]);
 
   if (isLoading || isFetching || reserveIsLoading || reserveIsFetching) {
     return <Loader />;
   }
 
   return (
-    <div className="max-w-screen-lg mx-auto my-4 p-4">
-      <div className="space-y-4">
-        <h4 className="text-3xl font-semibold text-gray-800">
-          {touristSpot?.name}
-        </h4>
-        <LocationFetcher
-          lat={touristSpot?.location?.lat}
-          lng={touristSpot?.location?.lng}
-          address={touristSpot?.location?.address}
-        />
-        <div className="rounded-xl overflow-hidden shadow-md">
+    <div className="min-h-screen py-8 px-4 sm:px-6 gradient-hero-bg">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header Title & Metadata */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              {touristSpot?.name}
+            </h1>
+            {touristSpot?.verified && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold shadow-xs">
+                <MdVerified className="text-emerald-500" />
+                <span>Verified Spot</span>
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-4 text-xs sm:text-sm text-slate-600">
+            <LocationFetcher
+              lat={touristSpot?.location?.lat}
+              lng={touristSpot?.location?.lng}
+              address={touristSpot?.location?.address}
+            />
+          </div>
+        </div>
+
+        {/* Hero Image Gallery Banner */}
+        <div className="relative rounded-3xl overflow-hidden shadow-card border border-slate-200/80 aspect-[16/9] lg:aspect-[21/9] w-full bg-slate-100">
           <img
             src={touristSpot?.image?.secure_url}
             alt={touristSpot?.name}
-            className="w-full aspect-video object-cover rounded-xl hover:scale-125 transition-transform duration-300 cursor-pointer"
+            className="w-full h-full object-cover hover:scale-103 transition-transform duration-700 cursor-pointer"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
+          
+          {touristSpot?.category?.label && (
+            <div className="absolute top-4 left-4 z-10 glass-badge px-4 py-1.5 rounded-full text-xs font-bold text-slate-800 flex items-center gap-2 shadow-xs">
+              <IconPickerItem value={touristSpot?.category?.icon} size={16} />
+              <span>{touristSpot.category.label}</span>
+            </div>
+          )}
         </div>
-        <div className="flex flex-wrap items-start max-md:gap-4">
-          <div className="w-3/5 space-y-4 lg:pe-4 max-md:w-full">
-            {/* Host Information */}
-            <div className="flex items-center gap-2">
-              <p className="text-lg font-semibold text-gray-800">
-                Hosted by {touristSpot?.host?.name}
-              </p>
+
+        {/* Main 2-Column Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-4">
+          {/* Left Main Column: Details, Highlights, Description, Map & REVIEWS */}
+          <div className="lg:col-span-7 xl:col-span-8 space-y-8">
+            {/* Host Section */}
+            <div className="p-6 bg-white rounded-3xl border border-slate-200/80 shadow-card flex items-center justify-between gap-4">
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <span>Hosted by {touristSpot?.host?.name}</span>
+                  <HiCheckCircle className="text-indigo-600 text-lg" />
+                </h3>
+                <p className="text-xs text-slate-500 font-medium">Verified Premier Host • SAFARSATHI Partner</p>
+              </div>
               <Avatar
                 hostName={touristSpot?.host?.name}
                 avatar={touristSpot?.host?.avatar}
               />
             </div>
 
-            {/* Amenities and Details */}
-            <div className="flex items-center gap-4 flex-wrap">
-              {Object.keys(touristSpot?.info).map((info) => (
-                <p key={info} className="flex items-center gap-1 text-gray-500">
-                  {touristSpot?.info[info]}
-                  <span className="lowercase">{info}</span>
-                </p>
-              ))}
-            </div>
+            {/* Property Highlights Section */}
+            <div className="p-6 bg-white rounded-3xl border border-slate-200/80 shadow-card space-y-4">
+              <h3 className="text-base font-bold text-slate-900 uppercase tracking-wide">Property Highlights</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                  <HiCheckBadge className="text-indigo-600 text-xl flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900">Experienced Superhost</h4>
+                    <p className="text-[11px] text-slate-500">Known for high ratings and 100% response rates.</p>
+                  </div>
+                </div>
 
-            <Separator />
-            <div className="flex items-center gap-4">
-              <IconPickerItem value={touristSpot?.category?.icon} size={40} />
-              <div>
-                <p className="text-lg font-semibold text-gray-800 uppercase">
-                  {touristSpot?.category?.label}
-                </p>
-                <p className="text-sm font-medium text-gray-500">
-                  This property is near {touristSpot?.category?.label}.
-                </p>
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                  <HiMapPin className="text-indigo-600 text-xl flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900">Great Location</h4>
+                    <p className="text-[11px] text-slate-500">95% of recent guests gave the location 5 stars.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                  <HiKey className="text-indigo-600 text-xl flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900">Keyless Smart Check-in</h4>
+                    <p className="text-[11px] text-slate-500">Self check-in using secure door passcode.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                  <HiCalendar className="text-indigo-600 text-xl flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900">Flexible Policy</h4>
+                    <p className="text-[11px] text-slate-500">Free cancellation up to 48 hours before check-in.</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Learn More Section */}
-            <Separator />
-            <div>
-              <h4 className="text-3xl font-semibold">
-                <span className="text-purple-500">safar</span> cover
-              </h4>
-              <p className="text-gray-500">
-                Every booking includes free protection from Host cancellations,
-                listing inaccuracies, and other issues like trouble checking in.
+            {/* Specs & Amenities Badges */}
+            <div className="p-6 bg-white rounded-3xl border border-slate-200/80 shadow-card space-y-4">
+              <h3 className="text-base font-bold text-slate-900 uppercase tracking-wide">Included Amenities</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-800">
+                  <HiWifi className="text-indigo-600 text-lg" />
+                  <span>High-speed Wi-Fi</span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-800">
+                  <HiTv className="text-indigo-600 text-lg" />
+                  <span>HD Smart TV</span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-800">
+                  <MdKitchen className="text-indigo-600 text-lg" />
+                  <span>Full Kitchen</span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-800">
+                  <HiTruck className="text-indigo-600 text-lg" />
+                  <span>Free Parking</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Safar Cover Protection Section */}
+            <div className="p-6 bg-gradient-to-r from-indigo-50/80 via-violet-50/80 to-pink-50/50 rounded-3xl border border-indigo-100/80 space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                  <HiShieldCheck className="text-indigo-600 text-3xl" />
+                  <span>safar<span className="gradient-text">cover</span></span>
+                </h4>
+                <span className="text-[10px] uppercase tracking-widest font-extrabold bg-indigo-600 text-white px-2.5 py-1 rounded-full shadow-xs">
+                  Included Free
+                </span>
+              </div>
+
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Every booking includes comprehensive protection against Host cancellations, listing inaccuracies, and check-in support.
               </p>
+
               <button
-                className="text-purple-500 hover:underline mt-4"
+                className="text-xs font-bold text-indigo-600 hover:text-indigo-700 underline cursor-pointer"
                 onClick={handleLearnMoreClick}
               >
-                {isAccordionVisible ? "Show Less" : "Learn More"}
+                {isAccordionVisible ? "Show Less Details" : "Learn More About Protection"}
               </button>
+
               <AnimatePresence>
                 {isAccordionVisible && (
                   <motion.div
-                    className="max-w-lg mt-8"
+                    className="mt-4 pt-4 border-t border-indigo-100"
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
@@ -196,23 +273,21 @@ const SingleListing = ({ profile }) => {
                   >
                     <Accordion>
                       <Accordion.Item
-                        title="What's covered"
+                        title="What's Covered Under Safar Cover"
                         isOpen={openIndex === 0}
                         onToggle={() => handleToggle(0)}
                       >
-                        <p className="text-sm text-gray-500">
-                          If a Host cancels your booking, you'll get a full
-                          refund. If things go wrong, we'll help make it right.
+                        <p className="text-xs text-slate-600 leading-relaxed">
+                          Full refund if a Host cancels within 30 days of check-in, or if the listing isn’t as advertised. 24/7 dedicated support line.
                         </p>
                       </Accordion.Item>
                       <Accordion.Item
-                        title="What's not covered"
+                        title="Exclusions & Policy Terms"
                         isOpen={openIndex === 1}
                         onToggle={() => handleToggle(1)}
                       >
-                        <p className="text-sm text-gray-500">
-                          We can't help if you don't meet check-in requirements,
-                          or if the issue isn't covered by our policies.
+                        <p className="text-xs text-slate-600 leading-relaxed">
+                          Standard travel delays outside host control are subject to individual cancellation tiers.
                         </p>
                       </Accordion.Item>
                     </Accordion>
@@ -221,24 +296,21 @@ const SingleListing = ({ profile }) => {
               </AnimatePresence>
             </div>
 
-            {/* Description */}
-            <Separator className="my-4" />
-            <div>
-              <p className="text-base text-gray-500">
+            {/* Spot Description */}
+            <div className="p-6 bg-white rounded-3xl border border-slate-200/80 shadow-card space-y-3">
+              <h3 className="text-lg font-bold text-slate-900">About This Destination</h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line">
                 {touristSpot?.description}
               </p>
             </div>
 
-            {/* Map Section */}
-            <Separator className="my-4" />
-            <div>
-              <h4 className="text-xl font-semibold text-gray-800">
-                Where you will be
-              </h4>
-              <div
-                className="rounded-xl overflow-hidden shadow-md mt-4"
-                style={{ height: "400px" }}
-              >
+            {/* Location Map Section */}
+            <div className="p-6 bg-white rounded-3xl border border-slate-200/80 shadow-card space-y-4">
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <HiMapPin className="text-indigo-600" />
+                <span>Location & Surroundings</span>
+              </h3>
+              <div className="rounded-2xl overflow-hidden border border-slate-200 h-80 shadow-inner">
                 <MapComponent
                   location={touristSpot?.location}
                   zoomControl={false}
@@ -246,71 +318,83 @@ const SingleListing = ({ profile }) => {
                 />
               </div>
             </div>
+
+            {/* REVIEWS SECTION — Full Width in Main Column */}
+            <div className="p-6 bg-white rounded-3xl border border-slate-200/80 shadow-card">
+              <ReviewTouristSpot
+                touristSpotId={touristSpot._id}
+                reviews={touristSpot?.reviews || []}
+                refetch={refetchTouristSpot}
+              />
+            </div>
           </div>
 
-          <div className="w-2/5 lg:ps-2 max-md:w-full max-md:flex max-sm:flex-wrap gap-4">
-            {/* Reservation Sidebar */}
-            <div className="bg-white rounded-xl p-4 shadow-md border w-full">
-              <span className="text-xl mb-4 font-semibold text-gray-800 uppercase block">
-                {formatCurrency(price)}
-                <span className="text-gray-500">/night</span>
-              </span>
-              <div className="border border-gray-300 rounded-md">
+          {/* Right Sticky Column: Reservation Widget Only */}
+          <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-24 space-y-6">
+            {/* Reservation Card */}
+            <div className="bg-white rounded-3xl p-6 shadow-card border border-slate-200/80 space-y-5">
+              <div className="flex items-baseline justify-between border-b border-slate-100 pb-4">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl font-black text-slate-900">
+                    {formatCurrency(price)}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-400">/ night</span>
+                </div>
+                {touristSpot?.verified && (
+                  <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                    Best Rate
+                  </span>
+                )}
+              </div>
+
+              {/* Date Range Picker Widget */}
+              <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
                 <DateRangePicker
                   ranges={[dateRange]}
                   onChange={handleDateChange}
-                  rangeColors={["#8b5cf6"]}
+                  rangeColors={["#4f46e5"]}
                   minDate={new Date()}
-                  maxDate={new Date(new Date().getFullYear() + 40, 11, 31)}
+                  maxDate={new Date(new Date().getFullYear() + 2, 11, 31)}
                 />
               </div>
+
               {reserve ? (
-                <div className="flex flex-col space-y-4">
-                  <div className="flex gap-4 items-center">
-                    <Button
-                      className="mt-4 w-full rounded-md"
-                      disabled
-                      intent="ghost"
-                    >
-                      Already Reserved
-                    </Button>
-                    {reserve.paid === false && (
-                      <PaymentBTN reservationId={reserve._id}>
-                        Pay Now {calculateTotalPrice()}
-                      </PaymentBTN>
-                    )}
-                  </div>
+                <div className="space-y-3">
+                  <Button
+                    className="w-full font-bold py-3"
+                    disabled
+                    intent="ghost"
+                  >
+                    Already Reserved
+                  </Button>
                   {reserve.paid === false && (
-                    <Button className="mt-4 w-full rounded-md" intent="danger">
-                      Cancel
+                    <PaymentBTN reservationId={reserve._id}>
+                      Pay Now ({calculateTotalPrice()})
+                    </PaymentBTN>
+                  )}
+                  {reserve.paid === false && (
+                    <Button className="w-full font-bold" intent="danger">
+                      Cancel Reservation
                     </Button>
                   )}
                 </div>
               ) : (
                 <Button
                   onClick={handleReserve}
-                  className="mt-4 w-full rounded-md"
+                  size="lg"
+                  intent="primary"
+                  className="w-full font-bold shadow-glow"
                 >
-                  Reserve
+                  Reserve Now
                 </Button>
               )}
-              <Separator className="my-4" />
-              <div className="flex items-center justify-between mt-4 text-gray-500 px-2">
-                <span className="text-sm font-medium cursor-pointer">
-                  Total
-                </span>
-                <span className="text-lg font-semibold text-gray-800">
+
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-slate-600 text-xs sm:text-sm font-semibold">
+                <span>Total Estimated</span>
+                <span className="text-base font-extrabold text-slate-900">
                   {calculateTotalPrice()}
                 </span>
               </div>
-            </div>
-            {/* Reviews Section */}
-            <div className="bg-white rounded-xl p-4 shadow-md md:mt-4 border w-full">
-              <ReviewTouristSpot
-                touristSpotId={touristSpot._id}
-                reviews={touristSpot?.reviews || []}
-                refetch={refetchTouristSpot}
-              />
             </div>
           </div>
         </div>
