@@ -21,9 +21,7 @@ const Home = () => {
     data: categories,
     isLoading,
   } = useGetCategoriesQuery(undefined, {
-    refetchOnMountOrArgChange: false,
-    refetchOnFocus: false,
-    refetchOnReconnect: false,
+    refetchOnMountOrArgChange: true,
   });
 
   const [page, setPage] = React.useState(1);
@@ -47,9 +45,7 @@ const Home = () => {
     children: searchParams.get("children"),
     infants: searchParams.get("infants"),
   }, {
-    refetchOnMountOrArgChange: false,
-    refetchOnFocus: false,
-    refetchOnReconnect: false,
+    refetchOnMountOrArgChange: true,
   });
 
   useEffect(() => {
