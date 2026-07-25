@@ -1,6 +1,5 @@
 import React from "react";
 import { useGetCurrentUserListedHomesQuery } from "../store/apis/touristspots";
-import Loader from "../components/ui/loader";
 import TouristSpotCard from "../components/ui/tourist-spot-card";
 import { HiHome, HiPlus, HiSparkles } from "react-icons/hi2";
 import { motion } from "framer-motion";
@@ -11,14 +10,9 @@ const ListedHomes = () => {
   const {
     data: listedHomes,
     isLoading: listedHomesIsLoading,
-    isFetching: listedHomesIsFetching,
   } = useGetCurrentUserListedHomesQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
-
-  if (listedHomesIsLoading || listedHomesIsFetching) {
-    return <Loader />;
-  }
 
   const homes = Array.isArray(listedHomes) ? listedHomes : [];
 
@@ -47,8 +41,18 @@ const ListedHomes = () => {
           </button>
         </div>
 
-        {/* Listings Grid or Empty State */}
-        {homes.length > 0 ? (
+        {/* Listings Grid or Skeletons or Empty State */}
+        {listedHomesIsLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white rounded-3xl p-3.5 space-y-3 border border-slate-200/80 shadow-card animate-pulse">
+                <div className="w-full aspect-[4/3] bg-slate-200 rounded-2xl"></div>
+                <div className="h-5 bg-slate-200 rounded-lg w-3/4"></div>
+                <div className="h-4 bg-slate-200 rounded-lg w-1/2"></div>
+              </div>
+            ))}
+          </div>
+        ) : homes.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {homes.map((home, index) => (
               <TouristSpotCard

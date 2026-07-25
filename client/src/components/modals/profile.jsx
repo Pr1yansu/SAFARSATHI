@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useProfileQuery } from "../../store/apis/user";
-import Loader from "../ui/loader";
 import { motion, AnimatePresence } from "framer-motion";
 import useModal from "../hooks/modal";
 import { IoCloseOutline } from "react-icons/io5";
@@ -8,7 +7,7 @@ import { HiUser, HiEnvelope, HiShieldCheck, HiSparkles, HiCamera, HiCalendar, Hi
 import toast from "react-hot-toast";
 
 const ProfileModal = () => {
-  const { data: profile, isLoading, isFetching } = useProfileQuery();
+  const { data: profile } = useProfileQuery();
   const { close: closeModal, isOpen: isModalOpen, variant } = useModal();
   const [data, setData] = useState({
     name: "",
@@ -25,10 +24,6 @@ const ProfileModal = () => {
 
   if (!isModalOpen || variant !== "profile") {
     return null;
-  }
-
-  if (isLoading || isFetching) {
-    return <Loader />;
   }
 
   const handleSave = () => {

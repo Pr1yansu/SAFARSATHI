@@ -1,7 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { useGetTouristSpotByIdsQuery } from "../store/apis/touristspots";
-import Loader from "../components/ui/loader";
 import TouristSpotCard from "../components/ui/tourist-spot-card";
 import { HiHeart } from "react-icons/hi2";
 import { motion } from "framer-motion";
@@ -12,14 +11,9 @@ const FavoriteListings = () => {
   const {
     data: touristSpots,
     isLoading: touristSpotsIsLoading,
-    isFetching: touristSpotsIsFetching,
   } = useGetTouristSpotByIdsQuery(likedSpots, {
     refetchOnMountOrArgChange: true,
   });
-
-  if (touristSpotsIsLoading || touristSpotsIsFetching) {
-    return <Loader />;
-  }
 
   const spots = Array.isArray(touristSpots) ? touristSpots : [];
 
@@ -45,7 +39,17 @@ const FavoriteListings = () => {
         </div>
 
         {/* Listings Grid or Empty State */}
-        {likedSpots.length > 0 && spots.length > 0 ? (
+        {touristSpotsIsLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white rounded-3xl p-3.5 space-y-3 border border-slate-200/80 shadow-card animate-pulse">
+                <div className="w-full aspect-[4/3] bg-slate-200 rounded-2xl"></div>
+                <div className="h-5 bg-slate-200 rounded-lg w-3/4"></div>
+                <div className="h-4 bg-slate-200 rounded-lg w-1/2"></div>
+              </div>
+            ))}
+          </div>
+        ) : likedSpots.length > 0 && spots.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {spots.map((spot, index) => (
               <TouristSpotCard key={spot._id} touristSpot={spot} index={index} />

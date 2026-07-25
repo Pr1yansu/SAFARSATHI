@@ -39,7 +39,7 @@ const Loader = ({ fullScreen = true, text = "Exploring luxury destinations..." }
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-slate-900/30 backdrop-blur-xs flex items-center justify-center p-4 pointer-events-none">
+    <div className="fixed inset-0 z-[9999] bg-slate-950/20 backdrop-blur-[2px] flex items-center justify-center p-4 pointer-events-none">
       {loaderCard}
     </div>
   );

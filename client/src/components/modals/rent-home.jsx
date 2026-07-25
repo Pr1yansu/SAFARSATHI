@@ -5,7 +5,6 @@ import { IoClose } from "react-icons/io5";
 import LocationPicker from "../filter-steps/map/location-picker";
 import CategoryPicker from "../rent/category-picker";
 import { useGetCategoriesQuery } from "../../store/apis/categories";
-import Loader from "../ui/loader";
 import AmenitiesCounter from "../rent/amenities-counter";
 import AddImage from "../rent/add-image";
 import GuestsAndRooms from "../rent/guess-rooms";
@@ -19,8 +18,6 @@ import toast from "react-hot-toast";
 const RentHome = () => {
   const {
     data: categories,
-    isLoading: categoriesLoading,
-    isFetching: categoriesFetching,
   } = useGetCategoriesQuery();
   const { isOpen, variant, close } = useModal();
   const [createTouristSpot] = useCreateTouristSpotMutation();
@@ -198,10 +195,6 @@ const RentHome = () => {
 
   if (variant !== "rent") {
     return null;
-  }
-
-  if (categoriesLoading || categoriesFetching) {
-    return <Loader />;
   }
 
   return (

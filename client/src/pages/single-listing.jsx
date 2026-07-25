@@ -30,8 +30,6 @@ const SingleListing = ({ profile }) => {
   const [createReserve] = useCreateReserveMutation();
   const {
     data: reserve,
-    isLoading: reserveIsLoading,
-    isFetching: reserveIsFetching,
     refetch: refetchReserve,
   } = useGetReserveByTouristSpotIdQuery(id, {
     skip: !id,
@@ -48,7 +46,6 @@ const SingleListing = ({ profile }) => {
   const {
     data: touristSpot,
     isLoading,
-    isFetching,
     refetch: refetchTouristSpot,
   } = useGetTouristSpotByIdQuery(id, {
     skip: !id,
@@ -112,8 +109,12 @@ const SingleListing = ({ profile }) => {
     }
   }, [profile, touristSpot, dateRange, price, createReserve, refetchReserve, open]);
 
-  if (isLoading || isFetching || reserveIsLoading || reserveIsFetching) {
-    return <Loader />;
+  if (isLoading && !touristSpot) {
+    return (
+      <div className="min-h-screen py-16 flex items-center justify-center">
+        <Loader fullScreen={false} text="Loading destination details..." />
+      </div>
+    );
   }
 
   return (
