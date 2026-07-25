@@ -37,10 +37,8 @@ const LocationPicker = ({ selectedLocation, setSelectedLocation }) => {
           navigator.geolocation.getCurrentPosition(
             async (position) => {
               const { latitude, longitude } = position.coords;
-              setSelectedLocation({ lat: latitude, lng: longitude });
-
-              // Fetch the address from geocoding API
               const address = await fetchAddress(latitude, longitude);
+              setSelectedLocation({ lat: latitude, lng: longitude, address });
               setDefaultOption({
                 label: address,
                 value: `${latitude},${longitude}`,
@@ -50,14 +48,15 @@ const LocationPicker = ({ selectedLocation, setSelectedLocation }) => {
             async () => {
               setDefaultOption(india || null);
               if (india) {
-                setSelectedLocation({
-                  lat: india.latlng[0],
-                  lng: india.latlng[1],
-                });
                 const address = await fetchAddress(
                   india.latlng[0],
                   india.latlng[1]
                 );
+                setSelectedLocation({
+                  lat: india.latlng[0],
+                  lng: india.latlng[1],
+                  address,
+                });
                 setDefaultOption({
                   label: address,
                   value: india.value,
@@ -69,14 +68,15 @@ const LocationPicker = ({ selectedLocation, setSelectedLocation }) => {
         } else {
           setDefaultOption(india || null);
           if (india) {
-            setSelectedLocation({
-              lat: india.latlng[0],
-              lng: india.latlng[1],
-            });
             const address = await fetchAddress(
               india.latlng[0],
               india.latlng[1]
             );
+            setSelectedLocation({
+              lat: india.latlng[0],
+              lng: india.latlng[1],
+              address,
+            });
             setDefaultOption({
               label: address,
               value: india.value,
@@ -91,17 +91,19 @@ const LocationPicker = ({ selectedLocation, setSelectedLocation }) => {
   }, [countries, setSelectedLocation]);
 
   const fetchAddress = async (lat, lng) => {
-    const url = `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${process.env.REACT_APP_OPENCAGE_API_KEY}`;
-
+    if (!lat || !lng) return "India";
     try {
-      const response = await axios.get(url);
-      if (response.data.results.length > 0) {
-        return response.data.results[0].formatted;
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+      );
+      if (response.data && response.data.display_name) {
+        const parts = response.data.display_name.split(",");
+        const shortAddress = parts.slice(0, 4).join(",").trim();
+        return shortAddress || response.data.display_name;
       }
-      return "Address not found";
+      return `Lat: ${Number(lat).toFixed(4)}, Lng: ${Number(lng).toFixed(4)}`;
     } catch (error) {
-      console.error("Geocoding error:", error);
-      return "Error fetching address";
+      return `Location (${Number(lat).toFixed(2)}, ${Number(lng).toFixed(2)})`;
     }
   };
 
@@ -111,14 +113,15 @@ const LocationPicker = ({ selectedLocation, setSelectedLocation }) => {
         (country) => country.value === selectedOption.value
       );
       if (location && location.latlng) {
-        setSelectedLocation({
-          lat: location.latlng[0],
-          lng: location.latlng[1],
-        });
         const address = await fetchAddress(
           location.latlng[0],
           location.latlng[1]
         );
+        setSelectedLocation({
+          lat: location.latlng[0],
+          lng: location.latlng[1],
+          address,
+        });
         setDefaultOption({
           label: address,
           value: selectedOption.value,
@@ -140,11 +143,15 @@ const LocationPicker = ({ selectedLocation, setSelectedLocation }) => {
           value: `${selectedLocation.lat},${selectedLocation.lng}`,
           latlng: [selectedLocation.lat, selectedLocation.lng],
         });
+        if (!selectedLocation.address || selectedLocation.address.includes("Error")) {
+          setSelectedLocation((prev) => ({ ...prev, address }));
+        }
       }
     };
 
     updateDefaultOption();
-  }, [selectedLocation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLocation.lat, selectedLocation.lng]);
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
