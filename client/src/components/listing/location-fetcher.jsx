@@ -12,19 +12,21 @@ const LocationFetcher = ({ lat, lng, address }) => {
       return;
     }
     const fetchLocation = async () => {
+      if (!lat || !lng) return;
       setLoading(true);
-      const url = `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${process.env.REACT_APP_OPENCAGE_API_KEY}`;
-
       try {
-        const response = await axios.get(url);
-        if (response.data.results.length > 0) {
-          setLocation(response.data.results[0].formatted);
+        const response = await axios.get(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+        );
+        if (response.data && response.data.display_name) {
+          const parts = response.data.display_name.split(",");
+          const shortAddress = parts.slice(0, 3).join(",").trim();
+          setLocation(shortAddress || response.data.display_name);
         } else {
-          setLocation("Location not found");
+          setLocation(`Lat: ${Number(lat).toFixed(2)}, Lng: ${Number(lng).toFixed(2)}`);
         }
       } catch (error) {
-        setLocation("Error fetching location");
-        console.error("Geocoding error:", error);
+        setLocation(`Location (${Number(lat).toFixed(2)}, ${Number(lng).toFixed(2)})`);
       } finally {
         setLoading(false);
       }

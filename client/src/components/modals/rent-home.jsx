@@ -2,12 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import useModal from "../hooks/modal";
 import { IoClose } from "react-icons/io5";
-import Button from "../ui/button";
 import LocationPicker from "../filter-steps/map/location-picker";
 import CategoryPicker from "../rent/category-picker";
 import { useGetCategoriesQuery } from "../../store/apis/categories";
 import Loader from "../ui/loader";
-import Separator from "../ui/separator";
 import AmenitiesCounter from "../rent/amenities-counter";
 import AddImage from "../rent/add-image";
 import GuestsAndRooms from "../rent/guess-rooms";
@@ -17,21 +15,6 @@ import {
   useGetTouristSpotsQuery,
 } from "../../store/apis/touristspots";
 import toast from "react-hot-toast";
-
-const Steps = ({ currentStep, totalSteps }) => {
-  return (
-    <div className="flex gap-2 items-center justify-start absolute top-6">
-      {Array.from({ length: totalSteps }).map((_, index) => (
-        <div
-          key={index}
-          className={`w-2 h-2 rounded-full ${
-            currentStep === index + 1 ? "bg-purple-500" : "bg-gray-300"
-          }`}
-        ></div>
-      ))}
-    </div>
-  );
-};
 
 const RentHome = () => {
   const {
@@ -207,37 +190,50 @@ const RentHome = () => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black/50 flex justify-center items-center z-50"
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex justify-center items-center z-50 p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onMouseDown={close}
         >
           <motion.div
-            className="bg-white rounded-md p-4 shadow-md max-w-md w-full mx-6 relative space-y-2 m-4"
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
+            className="bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200/80 max-w-xl w-full relative space-y-5 overflow-hidden scrollbar-none max-h-[90vh] flex flex-col justify-between"
+            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
             onMouseDown={(e) => e.stopPropagation()}
           >
-            <Button
-              className="absolute top-2 right-2"
-              onClick={close}
-              size="icon"
-              intent="ghost"
-            >
-              <IoClose size={24} />
-            </Button>
+            {/* Header & Step Bar */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
+                    Step {currentStep} of {totalSteps}
+                  </span>
+                  <h3 className="text-xl font-black text-slate-900 tracking-tight mt-1">
+                    List Your Property
+                  </h3>
+                </div>
+                <button
+                  onClick={close}
+                  className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors"
+                >
+                  <IoClose size={20} />
+                </button>
+              </div>
 
-            {/* Step Indicators */}
-            <Steps currentStep={currentStep} totalSteps={totalSteps} />
-
-            {/* Content based on step */}
-            <div className="text-sm font-semibold text-center text-zinc-800">
-              Rent your home
+              {/* Progress Line */}
+              <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full gradient-bg-primary transition-all duration-300 rounded-full"
+                  style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+                />
+              </div>
             </div>
-            <Separator />
-            <div>
+
+            {/* Step Content */}
+            <div className="flex-1 overflow-y-auto scrollbar-none py-2">
               {currentStep === 1 && (
                 <CategoryPicker
                   categories={categories}
@@ -281,29 +277,33 @@ const RentHome = () => {
               )}
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-between mt-4 gap-2">
-              {secondaryActionLabel && (
-                <Button
+            {/* Action Footer */}
+            <div className="flex items-center justify-between gap-3 pt-3 border-t border-slate-100">
+              {secondaryActionLabel ? (
+                <button
+                  type="button"
                   onClick={handleBack}
-                  className="bg-gray-300 px-4 py-2 rounded-md w-full"
-                  intent="outline"
-                  disabled={loading} // Disable button if loading
+                  disabled={loading}
+                  className="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl transition-colors disabled:opacity-50"
                 >
                   {secondaryActionLabel}
-                </Button>
-              )}
-              {loading ? ( // Show loading spinner instead of button
-                <Loader className="w-full h-10" />
+                </button>
               ) : (
-                <Button
-                  onClick={handleNext}
-                  className="bg-purple-500 text-white px-4 py-2 rounded-md w-full"
-                  disabled={loading}
-                >
-                  {actionLabel}
-                </Button>
+                <div></div>
               )}
+
+              <button
+                type="button"
+                onClick={handleNext}
+                disabled={loading}
+                className="px-8 py-3.5 gradient-bg-primary text-white font-bold text-xs sm:text-sm rounded-xl shadow-md hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                ) : (
+                  <span>{actionLabel}</span>
+                )}
+              </button>
             </div>
           </motion.div>
         </motion.div>
