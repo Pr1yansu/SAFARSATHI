@@ -147,7 +147,35 @@ const App = () => {
       <RentHome />
       <ForgotPassword />
       <Footer />
-      <Toaster position="bottom-right" reverseOrder={false} gutter={8} />
+      <Toaster
+        position="bottom-right"
+        reverseOrder={false}
+        gutter={8}
+        toastOptions={{
+          style: {
+            background: "#0f172a",
+            color: "#f8fafc",
+            borderRadius: "1rem",
+            border: "1px solid rgba(255, 255, 255, 0.15)",
+            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2)",
+            fontSize: "13px",
+            fontWeight: 600,
+            padding: "12px 18px",
+          },
+          success: {
+            iconTheme: {
+              primary: "#10b981",
+              secondary: "#0f172a",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#f43f5e",
+              secondary: "#0f172a",
+            },
+          },
+        }}
+      />
     </BrowserRouter>
   );
 };

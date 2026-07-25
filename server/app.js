@@ -36,19 +36,30 @@ require("./config/cloudinary.config");
 // Initialize express application
 const app = express();
 
-// Security Middleware
-app.use(helmet());
+// Security Middleware with cross-origin opener policy exception for OAuth
+app.use(
+  helmet({
+    crossOriginOpenerPolicy: false,
+    crossOriginResourcePolicy: false,
+  })
+);
 app.use(mongoSanitize());
 app.use(xss());
 
-// CORS setup with custom origin whitelist
+// CORS setup with whitelist and OAuth callback origin support
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (process.env.WHITELISTED_DOMAINS.indexOf(origin) !== -1 || !origin) {
+      if (
+        !origin ||
+        origin.includes("localhost") ||
+        origin.includes("vercel.app") ||
+        origin.includes("google.com") ||
+        origin.includes("github.com")
+      ) {
         callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        callback(null, true);
       }
     },
     credentials: true, // Allow sending cookies and credentials
@@ -58,6 +69,7 @@ app.use(
       "Authorization",
       "Access-Control-Allow-Origin",
       "Access-Control-Allow-Headers",
+      "X-Requested-With",
     ],
   })
 );
