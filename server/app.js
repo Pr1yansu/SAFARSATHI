@@ -87,6 +87,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// Trust proxy for Render/Cloudflare HTTPS reverse proxy
+app.set("trust proxy", 1);
+
 // Session middleware configuration
 app.use(
   session({
