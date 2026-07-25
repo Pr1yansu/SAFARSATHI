@@ -21,7 +21,7 @@ import {
 } from "../store/apis/reserve";
 import PaymentBTN from "../components/ui/payment-btn";
 import ReviewTouristSpot from "./components/review";
-import { HiShieldCheck, HiSparkles, HiUserGroup, HiCheckCircle, HiMapPin, HiKey, HiCalendar, HiCheckBadge, HiWifi, HiTv, HiTruck } from "react-icons/hi2";
+import { HiShieldCheck, HiCheckCircle, HiMapPin, HiKey, HiCalendar, HiCheckBadge, HiWifi, HiTv, HiTruck } from "react-icons/hi2";
 import { MdVerified, MdKitchen } from "react-icons/md";
 
 const SingleListing = ({ profile }) => {
