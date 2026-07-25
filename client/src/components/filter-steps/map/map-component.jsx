@@ -22,14 +22,25 @@ const MapComponent = ({
 
   const MapClickHandler = () => {
     useMapEvents({
-      click(e) {
+      async click(e) {
         if (setSelectedLocation) {
           const { lat, lng } = e.latlng;
-          setSelectedLocation({
-            lat,
-            lng,
-            address: defaultOption ? defaultOption.label : "random address",
-          });
+          try {
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+            );
+            const data = await res.json();
+            const addr = data?.display_name
+              ? data.display_name.split(",").slice(0, 4).join(",").trim()
+              : `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
+            setSelectedLocation({ lat, lng, address: addr });
+          } catch (err) {
+            setSelectedLocation({
+              lat,
+              lng,
+              address: `Location (${lat.toFixed(2)}, ${lng.toFixed(2)})`,
+            });
+          }
         }
       },
     });
