@@ -86,7 +86,16 @@ svg, circle, g {
 }
 
 .shadow-glow {
-  box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 10px 30px -5px rgba(79, 70, 229, 0.4);
+}
+
+/* Force high-contrast white fill/stroke on selected category pill icons */
+.gradient-bg-primary svg,
+.gradient-bg-primary svg path,
+.gradient-bg-primary svg g {
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+  color: #ffffff !important;
 }
 
 .shadow-card {

@@ -244,8 +244,11 @@ const Home = () => {
                       : "bg-white text-slate-700 border-slate-200/80 hover:border-indigo-300 hover:bg-slate-50 shadow-xs"
                   )}
                 >
-                  <div className={isSelected ? "text-white" : "text-slate-600"}>
-                    <IconPickerItem value={category.icon} size={18} color={isSelected ? "#FFFFFF" : "#475569"} />
+                  <div className={classNames(
+                    "w-7 h-7 rounded-xl flex items-center justify-center transition-colors shrink-0",
+                    isSelected ? "bg-white/20 text-white fill-white" : "bg-slate-100 text-slate-600"
+                  )}>
+                    <IconPickerItem value={category.icon} size={16} color={isSelected ? "#FFFFFF" : "#475569"} />
                   </div>
                   <span>{category.label}</span>
                 </motion.button>
@@ -273,12 +276,18 @@ const Home = () => {
             initial="hidden"
             animate="visible"
           >
-            {touristSpotsIsLoading ? (
+            {touristSpotsIsLoading || touristSpotsIsFetching ? (
               [...Array(8)].map((_, i) => (
-                <div key={i} className="bg-white rounded-2xl p-3 space-y-3 border border-slate-100 animate-pulse">
-                  <div className="w-full aspect-[4/3] bg-slate-200 rounded-xl"></div>
-                  <div className="h-4 bg-slate-200 rounded-md w-3/4"></div>
-                  <div className="h-4 bg-slate-200 rounded-md w-1/2"></div>
+                <div key={i} className="bg-white rounded-3xl p-3.5 space-y-3.5 border border-slate-200/80 shadow-card animate-pulse">
+                  <div className="w-full aspect-[4/3] bg-slate-200 rounded-2xl"></div>
+                  <div className="space-y-2">
+                    <div className="h-5 bg-slate-200 rounded-lg w-3/4"></div>
+                    <div className="h-4 bg-slate-200 rounded-lg w-1/2"></div>
+                  </div>
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                    <div className="h-6 bg-slate-200 rounded-lg w-1/3"></div>
+                    <div className="h-6 bg-slate-200 rounded-lg w-1/4"></div>
+                  </div>
                 </div>
               ))
             ) : spots?.length > 0 ? (
