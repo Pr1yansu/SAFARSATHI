@@ -7,6 +7,14 @@ import { FaGoogle, FaGithub } from "react-icons/fa";
 import { useLoginMutation, useRegisterMutation } from "../../store/apis/user";
 import { toast } from "react-hot-toast";
 
+const getBackendUrl = () => {
+  if (process.env.REACT_APP_BACKEND_URL) return process.env.REACT_APP_BACKEND_URL;
+  if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+    return "http://localhost:5000";
+  }
+  return "https://safarsathi-backend.onrender.com";
+};
+
 const Auth = () => {
   const [register] = useRegisterMutation();
   const [login] = useLoginMutation();
@@ -62,13 +70,11 @@ const Auth = () => {
   }, [variant, isOpen]);
 
   const handleGoogle = () => {
-    const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
-    window.open(`${backendUrl}/api/v1/users/auth/google`, "_self");
+    window.open(`${getBackendUrl()}/api/v1/users/auth/google`, "_self");
   };
 
   const handleGithub = () => {
-    const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
-    window.open(`${backendUrl}/api/v1/users/auth/github`, "_self");
+    window.open(`${getBackendUrl()}/api/v1/users/auth/github`, "_self");
   };
 
   if (variant !== "login" && variant !== "register") return null;
