@@ -53,10 +53,10 @@ const Home = () => {
   });
 
   useEffect(() => {
-    if (!touristSpotsIsLoading && touristSpots?.touristSpots) {
+    if (touristSpots?.touristSpots) {
       setSpots(touristSpots.touristSpots);
     }
-  }, [touristSpots, touristSpotsIsLoading]);
+  }, [touristSpots]);
 
   useEffect(() => {
     setPage(1);
@@ -258,10 +258,16 @@ const Home = () => {
         </section>
 
         {/* Tourist Spots Grid */}
-        <section className="space-y-4">
+        <section className="space-y-4 relative">
           <div className="flex items-center justify-between pt-4 border-t border-slate-200/60">
-            <h2 className="text-xl font-bold text-slate-900">
-              Featured Stays & Destinations
+            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <span>Featured Stays & Destinations</span>
+              {touristSpotsIsFetching && (
+                <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold animate-pulse">
+                  <div className="w-2 h-2 rounded-full bg-indigo-600 animate-ping"></div>
+                  <span>Updating...</span>
+                </div>
+              )}
             </h2>
             {touristSpots?.total > 0 && (
               <span className="text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1 rounded-full">
@@ -270,13 +276,23 @@ const Home = () => {
             )}
           </div>
 
+          {/* Smooth Refetching Progress Bar */}
+          {touristSpotsIsFetching && spots.length > 0 && (
+            <div className="w-full h-1 bg-indigo-100 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 animate-pulse w-full"></div>
+            </div>
+          )}
+
           <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            className={classNames(
+              "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 transition-all duration-300",
+              touristSpotsIsFetching && spots.length > 0 ? "opacity-50 pointer-events-none scale-[0.99]" : "opacity-100 scale-100"
+            )}
             variants={containerVariants}
             initial="hidden"
             animate="visible"
           >
-            {touristSpotsIsLoading || touristSpotsIsFetching ? (
+            {touristSpotsIsLoading && spots.length === 0 ? (
               [...Array(8)].map((_, i) => (
                 <div key={i} className="bg-white rounded-3xl p-3.5 space-y-3.5 border border-slate-200/80 shadow-card animate-pulse">
                   <div className="w-full aspect-[4/3] bg-slate-200 rounded-2xl"></div>
