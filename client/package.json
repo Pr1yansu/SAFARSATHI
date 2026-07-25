@@ -72,6 +72,6 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "22.x"
   }
 }
