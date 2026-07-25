@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Input from "../components/ui/input";
 import Button from "../components/ui/button";

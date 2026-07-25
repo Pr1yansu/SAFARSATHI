@@ -11,7 +11,6 @@ const ForgotPassword = () => {
   const { isOpen, variant, close, open } = useModal();
   const [loading, setLoading] = React.useState(false);
   const [email, setEmail] = React.useState("");
-  const [duration, setDuration] = React.useState(0);
   const [timer, setTimer] = React.useState(null);
   const [forgotPassword] = useForgotPasswordMutation();
 
@@ -57,7 +56,6 @@ const ForgotPassword = () => {
 
       if (data) {
         toast.success(data.message);
-        setDuration(data.duration);
         startTimer(data.duration); // Start the timer
       }
     } catch (error) {

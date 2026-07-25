@@ -31,7 +31,8 @@ const LocationFetcher = ({ lat, lng, address }) => {
     };
 
     fetchLocation();
-  }, [lat, lng]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lat, lng, address]);
 
   if (loading) {
     return (

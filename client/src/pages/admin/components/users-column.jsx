@@ -5,7 +5,7 @@ import { formatDate } from "../../../components/utils/utils";
 import { useProfileQuery } from "../../../store/apis/user";
 import toast from "react-hot-toast";
 const RoleChange = ({ row }) => {
-  const [role, setRole] = React.useState(row.original.role);
+  const [, setRole] = React.useState(row.original.role);
   const {
     data: profile,
     isLoading: profileLoading,
