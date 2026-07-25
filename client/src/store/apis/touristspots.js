@@ -12,14 +12,14 @@ export const touristSpotsApi = createApi({
   endpoints: (builder) => ({
     createTouristSpot: builder.mutation({
       query: (body) => ({
-        url: `${baseUrl}/create`,
+        url: "/create",
         method: "POST",
         body,
         credentials: "include",
       }),
       invalidatesTags: ["TouristSpots"],
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Error creating tourist spot";
       },
       transformResponse: (response) => {
         return response.message;
@@ -40,54 +40,54 @@ export const touristSpotsApi = createApi({
         if (data?.children) params.append("children", data.children);
         if (data?.infants) params.append("infants", data.infants);
 
-        return `${baseUrl}/?${params.toString()}`;
+        return `/?${params.toString()}`;
       },
       providesTags: ["TouristSpots"],
       transformResponse: (response) => {
         return response;
       },
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Error fetching tourist spots";
       },
     }),
     getTouristSpotById: builder.query({
-      query: (id) => `${baseUrl}/spot/${id}`,
+      query: (id) => `/spot/${id}`,
       providesTags: ["TouristSpots"],
       transformResponse: (response) => response.touristSpot,
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Error fetching spot";
       },
     }),
     getTouristSpotByIds: builder.query({
       query: (ids) => ({
-        url: `${baseUrl}/ids`,
+        url: "/ids",
         method: "POST",
         body: { ids },
       }),
       providesTags: ["TouristSpots"],
       transformResponse: (response) => response.touristSpots,
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Error fetching spots";
       },
     }),
     getCurrentUserListedHomes: builder.query({
-      query: () => `${baseUrl}/listed-homes`,
+      query: () => "/listed-homes",
       providesTags: ["TouristSpots"],
       transformResponse: (response) => response.touristSpots,
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Error fetching listed homes";
       },
     }),
     verifyTouristSpot: builder.mutation({
       query: ({ id, verified }) => ({
-        url: `${baseUrl}/verify/${id}`,
+        url: `/verify/${id}`,
         method: "PUT",
         credentials: "include",
         body: { verified },
       }),
       invalidatesTags: ["TouristSpots"],
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Verification failed";
       },
       transformResponse: (response) => {
         return response.message;

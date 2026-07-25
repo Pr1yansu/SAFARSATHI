@@ -9,7 +9,7 @@ export const userApi = createApi({
   endpoints: (builder) => ({
     register: builder.mutation({
       query: ({ password, email, name }) => ({
-        url: `${baseUrl}/register`,
+        url: "/register",
         method: "POST",
         body: {
           password,
@@ -19,17 +19,15 @@ export const userApi = createApi({
       }),
       invalidatesTags: ["User"],
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Registration failed";
       },
       transformResponse: (response) => {
-        console.log(response);
-
         return response.message;
       },
     }),
     login: builder.mutation({
       query: ({ password, email }) => ({
-        url: `${baseUrl}/login`,
+        url: "/login",
         method: "POST",
         body: {
           password,
@@ -39,7 +37,7 @@ export const userApi = createApi({
       }),
       invalidatesTags: ["User"],
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Invalid credentials";
       },
       transformResponse: (response) => {
         return response.message;
@@ -47,7 +45,7 @@ export const userApi = createApi({
     }),
     profile: builder.query({
       query: () => ({
-        url: `${baseUrl}/current/profile`,
+        url: "/current/profile",
         method: "GET",
         credentials: "include",
       }),
@@ -55,7 +53,7 @@ export const userApi = createApi({
     }),
     logout: builder.mutation({
       query: () => ({
-        url: `${baseUrl}/logout`,
+        url: "/logout",
         method: "GET",
         credentials: "include",
       }),
@@ -63,7 +61,7 @@ export const userApi = createApi({
     }),
     getAllUsers: builder.query({
       query: ({ page, limit }) => ({
-        url: limit ? `${baseUrl}?limit=${limit}` : `${baseUrl}?page=${page}`,
+        url: limit ? `?limit=${limit}` : `?page=${page}`,
         method: "GET",
         credentials: "include",
       }),
@@ -71,7 +69,7 @@ export const userApi = createApi({
     }),
     getUserById: builder.query({
       query: (id) => ({
-        url: `${baseUrl}/${id}`,
+        url: `/${id}`,
         method: "GET",
         credentials: "include",
       }),
@@ -79,7 +77,7 @@ export const userApi = createApi({
     }),
     updateUserRole: builder.mutation({
       query: ({ id, role }) => ({
-        url: `${baseUrl}/${id}/update-role`,
+        url: `/${id}/update-role`,
         method: "PUT",
         body: {
           role,
@@ -90,17 +88,16 @@ export const userApi = createApi({
     }),
     forgotPassword: builder.mutation({
       query: (email) => ({
-        url: `${baseUrl}/forgot-password`,
+        url: "/forgot-password",
         method: "POST",
         body: {
           email,
         },
       }),
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Error processing request";
       },
       transformResponse: (response) => {
-        console.log(response);
         return {
           message: response.message,
           duration: response.duration,
@@ -109,7 +106,7 @@ export const userApi = createApi({
     }),
     resetPassword: builder.mutation({
       query: ({ password, token }) => ({
-        url: `${baseUrl}/reset-password`,
+        url: "/reset-password",
         method: "POST",
         body: {
           password,
@@ -117,7 +114,7 @@ export const userApi = createApi({
         },
       }),
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Reset failed";
       },
       transformResponse: (response) => {
         return response.message;

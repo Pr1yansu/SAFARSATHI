@@ -12,9 +12,9 @@ export const chartsApi = createApi({
   endpoints: (builder) => ({
     getReservesByMonth: builder.query({
       query: ({ startDate, endDate }) =>
-        `${baseUrl}/reserves?startDate=${startDate}&endDate=${endDate}`,
+        `/reserves?startDate=${startDate}&endDate=${endDate}`,
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message;
       },
       transformResponse: (response) => {
         return response.data;
@@ -22,9 +22,9 @@ export const chartsApi = createApi({
       providesTags: ["Charts"],
     }),
     getReservesByCategory: builder.query({
-      query: () => `${baseUrl}/reserves/category`,
+      query: () => "/reserves/category",
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message;
       },
       transformResponse: (response) => {
         return response.data;
@@ -33,9 +33,9 @@ export const chartsApi = createApi({
     }),
     getOrders: builder.query({
       query: ({ startDate, endDate }) =>
-        `${baseUrl}/orders?startDate=${startDate}&endDate=${endDate}`,
+        `/orders?startDate=${startDate}&endDate=${endDate}`,
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message;
       },
       transformResponse: (response) => {
         return response.orders;
@@ -44,9 +44,9 @@ export const chartsApi = createApi({
     }),
     getTotalEarnings: builder.query({
       query: ({ startDate, endDate }) =>
-        `${baseUrl}/earnings?startDate=${startDate}&endDate=${endDate}`,
+        `/earnings?startDate=${startDate}&endDate=${endDate}`,
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message;
       },
       transformResponse: (response) => {
         return response.totalEarnings;

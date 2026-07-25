@@ -9,34 +9,34 @@ export const categoriesApi = createApi({
   endpoints: (builder) => ({
     createCategory: builder.mutation({
       query: (body) => ({
-        url: `${baseUrl}/create`,
+        url: "/create",
         method: "POST",
         body,
         credentials: "include",
       }),
       invalidatesTags: ["Categories"],
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Failed to create category";
       },
       transformResponse: (response) => {
         return response.message;
       },
     }),
     getCategories: builder.query({
-      query: () => `${baseUrl}/`,
+      query: () => "/",
       providesTags: ["Categories"],
       transformResponse: (response) => response.categories,
     }),
     updateCategory: builder.mutation({
       query: ({ id, body }) => ({
-        url: `${baseUrl}/update/${id}`,
+        url: `/update/${id}`,
         method: "PUT",
         body,
         credentials: "include",
       }),
       invalidatesTags: ["Categories"],
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Failed to update category";
       },
       transformResponse: (response) => {
         return response.message;
@@ -44,14 +44,14 @@ export const categoriesApi = createApi({
     }),
     deleteCategories: builder.mutation({
       query: ({ categories }) => ({
-        url: `${baseUrl}/delete`,
+        url: "/delete",
         method: "DELETE",
         credentials: "include",
         body: { categories },
       }),
       invalidatesTags: ["Categories"],
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Failed to delete category";
       },
       transformResponse: (response) => {
         return response.message;

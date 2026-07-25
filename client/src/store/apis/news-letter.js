@@ -12,14 +12,14 @@ export const newsLetterApi = createApi({
   endpoints: (builder) => ({
     subscribe: builder.mutation({
       query: (body) => ({
-        url: `${baseUrl}/subscribe`,
+        url: "/subscribe",
         method: "POST",
         body,
         credentials: "include",
       }),
       invalidatesTags: ["NewsLetter"],
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Subscription failed";
       },
       transformResponse: (response) => {
         return response.message;

@@ -17,13 +17,20 @@
 }
 
 /* Custom Scrollbar */
-* {
+body {
   scrollbar-color: #6366f1 #f1f5f9;
   scrollbar-width: thin;
 }
 
-*:hover {
-  scrollbar-color: #4f46e5 #e2e8f0;
+.scrollbar-none::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
 
 ::selection {

@@ -9,14 +9,14 @@ export const contactApi = createApi({
   endpoints: (builder) => ({
     sendMessage: builder.mutation({
       query: (body) => ({
-        url: `${baseUrl}/send-message`,
+        url: "/send-message",
         method: "POST",
         body,
         credentials: "include",
       }),
       invalidatesTags: ["Contact"],
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Failed to send message";
       },
       transformResponse: (response) => {
         return response.message;

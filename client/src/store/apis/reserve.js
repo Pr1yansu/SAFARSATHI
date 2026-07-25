@@ -12,7 +12,7 @@ export const reserveApi = createApi({
   endpoints: (builder) => ({
     createReserve: builder.mutation({
       query: (body) => ({
-        url: `${baseUrl}/create`,
+        url: "/create",
         method: "POST",
         body,
         credentials: "include",
@@ -20,9 +20,9 @@ export const reserveApi = createApi({
       invalidatesTags: ["Reserve"],
     }),
     getReserveByTouristSpotId: builder.query({
-      query: (id) => `${baseUrl}/tourist-spot/${id}`,
+      query: (id) => `/tourist-spot/${id}`,
       transformErrorResponse: (response) => {
-        return response.data.message;
+        return response?.data?.message || response?.message || "Error fetching reservation";
       },
       transformResponse: (response) => {
         return response.reserve;
@@ -31,7 +31,7 @@ export const reserveApi = createApi({
     }),
     createOrder: builder.mutation({
       query: ({ reserveId }) => ({
-        url: `${baseUrl}/order`,
+        url: "/order",
         method: "POST",
         body: {
           reserveId,
@@ -42,7 +42,7 @@ export const reserveApi = createApi({
     }),
     verifyPayment: builder.mutation({
       query: (body) => ({
-        url: `${baseUrl}/order/verify`,
+        url: "/order/verify",
         method: "POST",
         body,
         credentials: "include",
