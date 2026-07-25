@@ -51,7 +51,6 @@
   "devDependencies": {
     "@faker-js/faker": "^9.0.0",
     "jest": "^30.4.2",
-    "puppeteer": "^25.3.0",
     "supertest": "^7.2.2"
   }
 }
