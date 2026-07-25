@@ -47,6 +47,7 @@ const RentHome = () => {
     children: 0,
     infants: 0,
   });
+  const [selectedImages, setSelectedImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(0);
@@ -55,11 +56,10 @@ const RentHome = () => {
 
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 6;
-
-  const [loading, setLoading] = useState(false); // New loading state
+  const [loading, setLoading] = useState(false);
 
   const actionLabel = useMemo(() => {
-    return currentStep === totalSteps ? "Submit" : "Next";
+    return currentStep === totalSteps ? "Publish Listing" : "Next Step";
   }, [currentStep]);
 
   const secondaryActionLabel = useMemo(() => {
@@ -74,7 +74,7 @@ const RentHome = () => {
       case 1:
         if (!selectedCategory) {
           isValid = false;
-          toast.error("Please select a category.");
+          toast.error("Please pick a category for your property.");
         }
         break;
       case 2:
@@ -84,29 +84,37 @@ const RentHome = () => {
           !selectedLocation.address
         ) {
           isValid = false;
-          toast.error("Please select a valid location.");
+          toast.error("Please click on the map to set a valid property location.");
         }
         break;
       case 3:
         break;
       case 4:
-        if (!selectedImage) {
+        const currentImages = selectedImages.length > 0 ? selectedImages : selectedImage ? [selectedImage] : [];
+        if (currentImages.length === 0) {
           isValid = false;
-          toast.error("Please upload an image.");
+          toast.error("Please upload at least 1 photo for your listing.");
         }
         break;
       case 5:
         if (moreInfo.guests < 1 || moreInfo.rooms < 1) {
           isValid = false;
-          toast.error("Please provide valid guest and room information.");
+          toast.error("Please specify at least 1 guest capacity and 1 room.");
         }
         break;
       case 6:
-        if (!name || !description || price <= 0 || !address) {
+        if (!name || name.trim().length < 5) {
           isValid = false;
-          toast.error(
-            "Please provide all required details (name, description, price, and address)."
-          );
+          toast.error("Please enter a property title (min 5 characters).");
+        } else if (!description || description.trim().length < 15) {
+          isValid = false;
+          toast.error("Please provide a property description (min 15 characters).");
+        } else if (Number(price) < 100) {
+          isValid = false;
+          toast.error("Please enter a valid nightly price (minimum ₹100).");
+        } else if (!address) {
+          isValid = false;
+          toast.error("Please provide a street address.");
         }
         break;
       default:
@@ -127,13 +135,21 @@ const RentHome = () => {
   };
 
   const handleSubmit = async () => {
-    setLoading(true); // Set loading to true
+    setLoading(true);
     const formData = new FormData();
     formData.append("name", name);
     formData.append("category", selectedCategory);
     formData.append("location", JSON.stringify(selectedLocation));
     formData.append("amenities", JSON.stringify(amenities));
-    formData.append("image", selectedImage);
+    
+    const imageList = selectedImages.length > 0 ? selectedImages : selectedImage ? [selectedImage] : [];
+    if (imageList[0]) {
+      formData.append("image", imageList[0]);
+    }
+    imageList.forEach((img) => {
+      formData.append("images", img);
+    });
+
     formData.append("moreInfo", JSON.stringify(moreInfo));
     formData.append("description", description);
     formData.append("price", price);
@@ -141,12 +157,13 @@ const RentHome = () => {
 
     try {
       await createTouristSpot(formData).unwrap();
+      toast.success("Property listed successfully!");
       refetchAllTouristSpots();
       close();
     } catch (error) {
-      console.error("Submission error:", error);
+      toast.error(error?.data?.message || "Failed to publish listing.");
     } finally {
-      setLoading(false); // Reset loading state
+      setLoading(false);
     }
   };
 
@@ -154,6 +171,7 @@ const RentHome = () => {
     if (!isOpen) {
       setCurrentStep(1);
       setSelectedCategory(null);
+      setSelectedImages([]);
       setSelectedImage(null);
       setSelectedLocation({ lat: null, lng: null, address: "" });
       setAmenities({
@@ -255,6 +273,8 @@ const RentHome = () => {
               )}
               {currentStep === 4 && (
                 <AddImage
+                  selectedImages={selectedImages}
+                  setSelectedImages={setSelectedImages}
                   onChange={(image) => setSelectedImage(image)}
                   selectedImage={selectedImage}
                   setSelectedImage={setSelectedImage}
