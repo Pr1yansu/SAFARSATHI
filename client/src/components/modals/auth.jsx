@@ -70,11 +70,11 @@ const Auth = () => {
   }, [variant, isOpen]);
 
   const handleGoogle = () => {
-    window.open(`${getBackendUrl()}/api/v1/users/auth/google`, "_self");
+    window.location.href = `${getBackendUrl()}/api/v1/users/auth/google`;
   };
 
   const handleGithub = () => {
-    window.open(`${getBackendUrl()}/api/v1/users/auth/github`, "_self");
+    window.location.href = `${getBackendUrl()}/api/v1/users/auth/github`;
   };
 
   if (variant !== "login" && variant !== "register") return null;
