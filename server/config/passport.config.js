@@ -90,6 +90,7 @@ passport.use(
       const emailResponse = await fetch("https://api.github.com/user/emails", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
+          "User-Agent": "SAFARSATHI-App",
         },
       });
 

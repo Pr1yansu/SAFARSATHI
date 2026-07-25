@@ -35,6 +35,8 @@ route.post("/login", (req, res) => {
   })(req, res);
 });
 
+const clientUrl = process.env.FRONTEND_URL || process.env.CLIENT_URL || "http://localhost:3000";
+
 route.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
@@ -44,20 +46,20 @@ route.get(
   "/auth/google/callback",
   passport.authenticate("google", {
     failureMessage: "Cannot login to Google",
-    failureRedirect: `${process.env.FRONTEND_URL}`,
-    successRedirect: `${process.env.FRONTEND_URL}`,
+    failureRedirect: `${clientUrl}`,
+    successRedirect: `${clientUrl}`,
     successMessage: "Logged in with Google",
   })
 );
 
-route.get("/auth/github", passport.authenticate("github"));
+route.get("/auth/github", passport.authenticate("github", { scope: ["user:email"] }));
 
 route.get(
   "/auth/github/callback",
   passport.authenticate("github", {
     failureMessage: "Cannot login to Github",
-    failureRedirect: `${process.env.FRONTEND_URL}`,
-    successRedirect: `${process.env.FRONTEND_URL}`,
+    failureRedirect: `${clientUrl}`,
+    successRedirect: `${clientUrl}`,
     successMessage: "Logged in with Github",
   })
 );
