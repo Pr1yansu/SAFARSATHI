@@ -84,20 +84,9 @@ app.use(
   fileUpload({
     useTempFiles: true,
     tempFileDir: os.tmpdir(),
-    limits: { fileSize: 10 * 1024 * 1024 }, // Limit file size to 10MB
+    limits: { fileSize: 25 * 1024 * 1024 }, // Limit file size to 25MB
   })
 );
-
-// Custom file size error handling middleware
-app.use((req, res, next) => {
-  if (req.files && req.files.image.size > 10000000) {
-    return res.status(400).json({
-      success: false,
-      message: "File size too large (max 10MB)",
-    });
-  }
-  next();
-});
 
 // Trust proxy for Render/Cloudflare HTTPS reverse proxy
 app.set("trust proxy", 1);
