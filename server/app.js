@@ -3,6 +3,7 @@ require("dotenv").config({ path: "./.env" });
 
 // Import required packages and modules
 const express = require("express");
+const mongoose = require("mongoose");
 const os = require("os");
 const morgan = require("morgan");
 const session = require("express-session");
@@ -127,6 +128,34 @@ app.get(
     return res.send("API is running on port 5000");
   })
 );
+
+// Ping & Health Endpoint for Database & Server Keep-Alive
+const pingHandler = asyncErrorHandler(async (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  const states = { 0: "disconnected", 1: "connected", 2: "connecting", 3: "disconnecting" };
+
+  let pingMs = null;
+  if (dbState === 1 && mongoose.connection.db) {
+    const start = Date.now();
+    await mongoose.connection.db.admin().ping();
+    pingMs = Date.now() - start;
+  }
+
+  return res.status(200).json({
+    success: true,
+    status: "healthy",
+    message: "Safarsathi backend & MongoDB active",
+    database: {
+      state: states[dbState] || "unknown",
+      pingMs: pingMs !== null ? `${pingMs}ms` : null,
+    },
+    uptime: `${Math.floor(process.uptime())}s`,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+app.get("/ping", pingHandler);
+app.get("/api/v1/health", pingHandler);
 
 app.use("/api/v1/countries", require("./routes/countries.routes"));
 app.use("/api/v1/users", require("./routes/users.routes"));

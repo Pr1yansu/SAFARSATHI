@@ -18,6 +18,14 @@ import AdminHeader from "./components/ui/admin-header";
 import ForgotPassword from "./components/modals/forgot-password";
 import Footer from "./components/footer/footer";
 
+const getBackendUrl = () => {
+  if (process.env.REACT_APP_BACKEND_URL) return process.env.REACT_APP_BACKEND_URL;
+  if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+    return "http://localhost:5000";
+  }
+  return "https://safarsathi-backend.onrender.com";
+};
+
 const Home = React.lazy(() => import("./pages/home"));
 const SingleListing = React.lazy(() => import("./pages/single-listing"));
 const FavoriteListings = React.lazy(() => import("./pages/favorite-listings"));
@@ -57,6 +65,19 @@ const AuthProvider = ({ children }) => {
 
 const App = () => {
   const { data: profile } = useProfileQuery();
+
+  useEffect(() => {
+    const pingServer = async () => {
+      try {
+        await fetch(`${getBackendUrl()}/ping`, { method: "GET", credentials: "include" });
+      } catch (err) {
+        // Silent
+      }
+    };
+    pingServer();
+    const interval = setInterval(pingServer, 4 * 60 * 1000); // Keep backend & DB awake every 4 mins
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <BrowserRouter>
